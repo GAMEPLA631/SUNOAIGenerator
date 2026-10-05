@@ -1,658 +1,512 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="sk" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SPECTER-OS v5.0 // Quantum Wall-Penetration & Ghost HUD</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQ CREATOR AI - Next-Gen Human-AI Audio Core</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Three.js pre 3D Duchov a Monštrá -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- GunDB: Real-time Cloud DB bez nutnosti API kľúčov -->
+    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
     
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#05070f',
+                            card: 'rgba(13, 17, 34, 0.75)',
+                            neon: '#00f2fe',
+                            magenta: '#ff007f',
+                            purple: '#7928ca'
+                        }
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 15px rgba(0, 242, 254, 0.4), inset 0 0 15px rgba(255, 0, 127, 0.2)' },
+                            '50%': { boxShadow: '0 0 30px rgba(0, 242, 254, 0.8), inset 0 0 20px rgba(255, 0, 127, 0.5)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;900&display=swap');
-
-        * {
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-            font-family: 'Share Tech Mono', monospace;
+        body {
+            background-color: #05070f;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(121, 40, 202, 0.18) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 242, 254, 0.18) 0px, transparent 50%);
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+            min-height: 100vh;
         }
-
-        .font-cyber { font-family: 'Orbitron', sans-serif; }
-
-        /* Filtre nočného videnia */
-        .nv-green { filter: brightness(1.25) contrast(1.6) hue-rotate(65deg) saturate(3.5); }
-        .nv-thermal { filter: brightness(1.3) contrast(2.2) invert(1) hue-rotate(180deg) saturate(6); }
-        .nv-red { filter: brightness(1.1) contrast(1.8) hue-rotate(310deg) saturate(4.5); }
-        .nv-uv { filter: brightness(1.2) contrast(1.5) hue-rotate(250deg) saturate(4); }
-        .nv-xray { filter: brightness(1.4) contrast(3) grayscale(1) invert(0.9); }
-
-        .scanlines {
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.45) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
-            background-size: 100% 3px, 3px 100%;
-            pointer-events: none;
+        .glass-panel {
+            background: rgba(13, 18, 36, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 242, 254, 0.25);
         }
-
-        .radar-sweep {
-            background: conic-gradient(from 0deg at 50% 50%, rgba(34, 197, 94, 0.45) 0deg, rgba(34, 197, 94, 0) 65deg);
-            animation: radarRotate 2.2s linear infinite;
+        .glass-panel:hover {
+            border-color: rgba(0, 242, 254, 0.45);
         }
-
-        @keyframes radarRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .glow-text {
+            text-shadow: 0 0 12px rgba(0, 242, 254, 0.6);
         }
-
-        /* Pulzujúci termálny prienik cez steny */
-        @keyframes wallPulse {
-            0% { transform: scale(0.98); opacity: 0.6; }
-            50% { transform: scale(1.02); opacity: 0.95; filter: drop-shadow(0 0 15px #22c55e); }
-            100% { transform: scale(0.98); opacity: 0.6; }
-        }
-        .wall-target-anim { animation: wallPulse 2.5s infinite ease-in-out; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #05070f; }
+        ::-webkit-scrollbar-thumb { background: #00f2fe44; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f2fe; }
     </style>
 </head>
-<body class="bg-black text-green-500 h-screen w-screen overflow-hidden flex justify-center items-center">
+<body class="p-4 md:p-8 relative selection:bg-cyan-500 selection:text-black">
 
-    <!-- HLAVNÝ MOBILNÝ KONTAJNER 16:9 -->
-    <div id="app-viewport" class="relative w-full h-full max-w-[480px] max-h-[960px] aspect-[9/16] bg-black overflow-hidden flex flex-col justify-between border-x border-green-900/50 shadow-2xl">
+    <!-- Horná Navigácia -->
+    <header class="max-w-7xl mx-auto flex flex-wrap justify-between items-center pb-6 border-b border-cyan-500/20 mb-8 gap-4">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(0,242,254,0.6)] animate-pulse">
+                <i data-lucide="disc-3" class="text-white w-6 h-6 animate-spin" style="animation-duration: 6s;"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-pink-500 to-purple-400 glow-text">AQ CREATOR</h1>
+                <p class="text-xs text-cyan-400/70 font-mono tracking-widest uppercase">Hybrid Human-AI Audio Core</p>
+            </div>
+        </div>
 
-        <!-- ========================================================== -->
-        <!-- 1. OBRAZOVKA: INŠTALÁCIA 999 MB (4 MINÚTY V REÁLNOM ČASE) -->
-        <!-- ========================================================== -->
-        <div id="screen-install" class="absolute inset-0 z-50 bg-black flex flex-col justify-between p-6">
-            <div class="text-center mt-6">
-                <div class="inline-block p-4 border border-green-500/40 rounded-2xl bg-green-950/20 mb-3 shadow-lg shadow-green-500/20 animate-pulse">
-                    <i data-lucide="scan" class="w-12 h-12 text-green-400"></i>
-                </div>
-                <h1 class="font-cyber text-2xl font-black tracking-widest text-white">SPECTER<span class="text-green-500">-OS</span></h1>
-                <p class="text-[11px] text-green-400/80 uppercase tracking-widest mt-1">QUANTUM THRU-WALL & SPECTRAL SUITE v5.0</p>
-                <div class="inline-block mt-2 px-3 py-0.5 bg-red-950/60 border border-red-500/40 text-red-400 text-[10px] font-bold rounded">
-                    VEĽKOSŤ BALÍKA: 999.00 MB
-                </div>
+        <div class="flex items-center space-x-4">
+            <!-- Denný limit používateľa -->
+            <div class="glass-panel px-4 py-2 rounded-xl flex items-center space-x-2 border border-pink-500/30">
+                <i data-lucide="zap" class="text-pink-500 w-4 h-4"></i>
+                <span class="text-xs text-gray-400 font-mono">Kredity dnes:</span>
+                <span id="creditsCount" class="font-bold text-pink-400 font-mono">4/4</span>
             </div>
 
-            <!-- TERMINÁL S PREBIEHAJÚCIMI OPERÁCIAMI -->
-            <div class="space-y-3">
-                <div class="flex justify-between items-end text-xs font-mono">
-                    <span class="text-green-400 font-bold">ČAS DO DOKONČENIA:</span>
-                    <span id="install-timer" class="text-white font-cyber font-bold text-sm">04:00</span>
-                </div>
-
-                <div id="install-terminal" class="h-32 bg-zinc-950 border border-green-900/70 p-3 rounded-lg font-mono text-[10px] space-y-1 text-green-400/90 overflow-hidden flex flex-col justify-end">
-                    <div>> Inicializácia inštalačného protokolu...</div>
-                </div>
-
-                <div class="space-y-1">
-                    <div class="flex justify-between text-xs font-mono">
-                        <span id="install-downloaded" class="text-green-400">0.00 MB / 999.00 MB</span>
-                        <span id="install-pct" class="font-bold text-white">0.0%</span>
-                    </div>
-                    <div class="w-full bg-zinc-900 h-2.5 rounded-full overflow-hidden border border-green-900/80 p-0.5">
-                        <div id="install-bar" class="bg-gradient-to-r from-green-600 to-emerald-400 h-full w-0 transition-all duration-200 rounded-full"></div>
-                    </div>
-                    <div class="flex justify-between text-[9px] text-zinc-500">
-                        <span>RÝCHLOSŤ: <span id="download-speed" class="text-green-400 font-mono">4.16 MB/s</span></span>
-                        <span>KANÁL: ENCRYPTED-SAT-4</span>
-                    </div>
-                </div>
-            </div>
-
-            <button id="btn-start-auth" class="hidden w-full py-4 bg-green-500 text-black font-cyber font-bold rounded-lg tracking-widest text-sm hover:bg-green-400 transition shadow-lg shadow-green-500/40 animate-bounce">
-                SPUSTIŤ SYSTÉM (AUTORIZÁCIA)
+            <!-- Prepínač Admin / User s ochranou hesla -->
+            <button onclick="handleAdminAuth()" id="modeToggleBtn" class="px-4 py-2 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500 hover:text-black transition-all duration-300 font-mono text-sm flex items-center space-x-2 shadow-[0_0_10px_rgba(0,242,254,0.2)]">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                <span id="modeText">Admin Core</span>
             </button>
         </div>
+    </header>
 
-
-        <!-- ========================================================== -->
-        <!-- 2. OBRAZOVKA: PRIHLÁSENIE / REGISTRÁCIA -->
-        <!-- ========================================================== -->
-        <div id="screen-auth" class="hidden absolute inset-0 z-40 bg-black/95 backdrop-blur-md flex flex-col justify-between p-6">
-            <div class="text-center mt-8">
-                <i data-lucide="shield-check" class="w-12 h-12 text-green-400 mx-auto mb-2"></i>
-                <h2 class="font-cyber text-xl font-bold text-white tracking-wider">BEZPEČNOSTNÝ PRÍSTUP</h2>
-                <p class="text-xs text-green-500/60">Taktický výskum anomálií & prienik cez prekážky</p>
-            </div>
-
-            <div class="space-y-4">
-                <div class="flex border-b border-green-900 text-sm">
-                    <button class="flex-1 py-2 text-green-400 border-b-2 border-green-500 font-bold">PRIHLÁSENIE AGENTA</button>
-                    <button class="flex-1 py-2 text-green-800 font-bold">REGISTRÁCIA</button>
-                </div>
-
-                <div class="space-y-3">
-                    <div>
-                        <label class="text-[10px] text-green-400 tracking-wider">IDENTIFIKÁTOR OPERÁTORA</label>
-                        <input type="text" value="AGENT_PARANORMAL_09" class="w-full bg-zinc-900/90 border border-green-800 rounded p-3 text-white text-xs focus:border-green-400 outline-none">
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-green-400 tracking-wider">KLASIFIKOVANÉ HESLO</label>
-                        <input type="password" value="••••••••••••" class="w-full bg-zinc-900/90 border border-green-800 rounded p-3 text-white text-xs focus:border-green-400 outline-none">
-                    </div>
-                </div>
-
-                <button id="btn-login-submit" class="w-full py-4 bg-green-500 text-black font-cyber font-bold rounded tracking-widest text-xs transition flex items-center justify-center gap-2 hover:bg-green-400">
-                    <i data-lucide="scan-face" class="w-5 h-5"></i> AUTORIZOVAŤ A OTVORIŤ SKENER
-                </button>
-            </div>
-
-            <p class="text-[10px] text-center text-zinc-600">Specter Quantum Sub-Surface Clearance Lv.5</p>
-        </div>
-
-
-        <!-- ========================================================== -->
-        <!-- 3. HLAVNÝ SKENER (HUD + 3D PRÍZRAKY + PRIENIK CEZ STENY) -->
-        <!-- ========================================================== -->
-        <div id="screen-scanner" class="hidden relative w-full h-full flex flex-col justify-between overflow-hidden">
-            
-            <!-- Živý stream z kamery -->
-            <video id="camera-stream" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover nv-green transition-all duration-300"></video>
-            
-            <!-- 3D WebGL Plátno (Three.js Monštrá) -->
-            <canvas id="three-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
-
-            <!-- SCANLINES EFEKT -->
-            <div class="scanlines absolute inset-0 z-20"></div>
-
-            <!-- VRSTVA PRIENIKU CEZ STENY (X-RAY SILUETY & MERANIE VZDIALENOSTI) -->
-            <div id="thru-wall-layer" class="absolute inset-0 z-25 pointer-events-none flex items-center justify-center transition-opacity duration-500">
-                <!-- Silueta postavy cez stenu -->
-                <div id="wall-human-target" class="absolute left-12 top-1/3 wall-target-anim border-2 border-dashed border-emerald-400/80 bg-emerald-500/20 p-2 rounded-lg backdrop-blur-[1px] hidden">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="user-x" class="w-8 h-8 text-emerald-300"></i>
-                        <div class="text-[9px] font-mono text-emerald-300 leading-tight">
-                            <span class="font-bold text-white bg-emerald-950 px-1">DETEKCIA ZA STENOU</span><br>
-                            VZDIALENOSŤ: <span class="font-bold text-white">3.4 m</span><br>
-                            TEP: <span class="text-red-400">78 BPM</span> (ČLOVEK)
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Druhý cieľ (Neznáma entita za stenou) -->
-                <div id="wall-specter-target" class="absolute right-8 bottom-1/3 wall-target-anim border-2 border-red-500/80 bg-red-950/30 p-2 rounded-lg hidden">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="flame" class="w-8 h-8 text-red-400 animate-bounce"></i>
-                        <div class="text-[9px] font-mono text-red-300 leading-tight">
-                            <span class="font-bold text-white bg-red-900 px-1">PRIENIK CEZ PREKÁŽKU</span><br>
-                            VZDIALENOSŤ: <span class="font-bold text-white">5.8 m</span><br>
-                            PODPIS: <span class="text-yellow-400">SPEKTRÁLNE MONŠTRUM</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- HUD: HORNÝ PANEL -->
-            <div class="relative z-30 p-4 bg-gradient-to-b from-black/90 via-black/40 to-transparent space-y-2">
-                <div class="flex justify-between items-center text-xs">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
-                        <span class="font-cyber font-bold tracking-wider text-white">REC 1080p60 HQ</span>
-                    </div>
-                    <div id="rec-timer" class="text-red-500 font-bold hidden font-mono">00:00</div>
-                    <div class="flex items-center gap-2">
-                        <button id="btn-open-settings" class="p-1.5 bg-black/60 border border-green-500/40 rounded-lg text-green-400 hover:text-white">
-                            <i data-lucide="settings" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- PREPÍNAČ REŽIMOV SKENOVANIA -->
-                <div class="flex justify-between items-center bg-black/70 backdrop-blur-md p-1.5 rounded-lg border border-green-500/30">
-                    <span class="text-[9px] font-bold text-white pl-1 uppercase">REŽIM:</span>
-                    <div class="flex gap-1">
-                        <button onclick="setFilter('nv-green')" class="px-2 py-0.5 text-[9px] bg-green-500/20 border border-green-500 rounded text-green-400">NOČNÉ ZELENÉ</button>
-                        <button onclick="setFilter('nv-thermal')" class="px-2 py-0.5 text-[9px] bg-yellow-500/20 border border-yellow-500 rounded text-yellow-400">TERMÁL</button>
-                        <button onclick="setFilter('nv-red')" class="px-2 py-0.5 text-[9px] bg-red-500/20 border border-red-500 rounded text-red-400">ČERVENÝ</button>
-                        <button onclick="setFilter('nv-xray')" class="px-2 py-0.5 text-[9px] bg-cyan-500/20 border border-cyan-500 rounded text-cyan-300">X-RAY PRIENIK</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- HUD: STRED (EMF METER, RADAR, ZAMERIAVAČ) -->
-            <div class="relative z-30 flex-1 flex flex-col justify-between items-center px-4 pointer-events-none">
-                <div class="w-full flex items-center justify-between mt-1">
-                    <div class="bg-black/70 p-2 rounded border border-green-500/30">
-                        <div class="text-[8px] text-green-400">RADAR CEZ STENY (SONAR)</div>
-                        <div id="wall-radar-status" class="text-xs font-bold font-cyber text-emerald-400">AKTÍVNY • 2 CIELE</div>
+    <main class="max-w-7xl mx-auto">
+        <!-- ================= USER VIEW ================= -->
+        <div id="userView" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Prompt Engine Formulár -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="glass-panel p-6 rounded-2xl relative overflow-hidden shadow-2xl animate-pulse-glow">
+                    <div class="flex items-center space-x-2 mb-4 text-cyan-400">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                        <h2 class="text-lg font-bold tracking-wide">Studio Prompt Engine</h2>
                     </div>
 
-                    <!-- MINIKOMPAS & RADAR -->
-                    <div class="relative w-16 h-16 rounded-full border border-green-500/40 bg-black/60 overflow-hidden flex items-center justify-center">
-                        <div class="absolute inset-0 radar-sweep"></div>
-                        <div id="radar-blip-1" class="absolute w-2 h-2 rounded-full bg-emerald-400 animate-ping" style="top: 25%; left: 30%;"></div>
-                        <div id="radar-blip-2" class="absolute w-2 h-2 rounded-full bg-red-500 animate-ping" style="bottom: 30%; right: 25%;"></div>
-                        <div class="w-1 h-1 rounded-full bg-white z-10"></div>
-                    </div>
-                </div>
-
-                <!-- HLAVNÝ ZAMERIAVACÍ KRUH -->
-                <div id="reticle" class="w-44 h-44 border border-green-500/30 rounded-full flex items-center justify-center relative transition-all duration-300">
-                    <div class="w-36 h-36 border border-dashed border-green-500/20 rounded-full animate-spin" style="animation-duration: 20s;"></div>
-                    <div class="w-2 h-2 bg-green-500/80 rounded-full"></div>
-                    <div class="absolute -top-3 text-[8px] bg-black px-1.5 border border-green-500/40 text-green-400">QUANTUM LOCK</div>
-                </div>
-
-                <!-- SPIRIT BOX & FREKVENCIA -->
-                <div class="bg-black/80 px-4 py-1 rounded border border-green-500/30 text-center mb-1">
-                    <span class="text-[9px] text-green-400/80">ZVUKOVÝ PREPIS ÉTERU: </span>
-                    <span id="spirit-sub" class="text-xs font-bold text-white tracking-wide">POČÚVAM FREKVENCIE...</span>
-                </div>
-            </div>
-
-            <!-- HUD: SPODNÝ OVLÁDACÍ PANEL -->
-            <div class="relative z-30 p-4 bg-gradient-to-t from-black/95 via-black/85 to-transparent">
-                <div class="flex justify-around items-center">
-                    
-                    <!-- Prepínač viditeľnosti cez steny -->
-                    <button id="btn-toggle-wall" class="flex flex-col items-center gap-1 text-emerald-400 active:scale-95 transition">
-                        <div class="p-3 bg-emerald-950/60 border border-emerald-500/50 rounded-full">
-                            <i data-lucide="eye" class="w-5 h-5"></i>
-                        </div>
-                        <span class="text-[8px] font-bold">CEZ STENY</span>
-                    </button>
-
-                    <!-- HLAVNÉ TLAČIDLO NAHRÁVANIA (Export 1080p60 do mobilu) -->
-                    <button id="btn-record" class="p-1 rounded-full border-2 border-red-500/60 hover:border-red-400 transition active:scale-95">
-                        <div id="rec-btn-core" class="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg shadow-red-600/50">
-                            <i data-lucide="video" class="w-7 h-7 text-white"></i>
-                        </div>
-                    </button>
-
-                    <!-- Spawnovanie 3D Monštra -->
-                    <button id="btn-spawn" class="flex flex-col items-center gap-1 text-green-400 active:scale-95 transition">
-                        <div class="p-3 bg-green-950/60 border border-green-500/40 rounded-full">
-                            <i data-lucide="skull" class="w-5 h-5"></i>
-                        </div>
-                        <span class="text-[8px] font-bold">VYVOLAŤ</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- ========================================================== -->
-            <!-- 4. MODÁLNE OKNO: NASTAVENIA (SETTINGS) -->
-            <!-- ========================================================== -->
-            <div id="modal-settings" class="hidden absolute inset-0 z-50 bg-black/95 backdrop-blur-lg p-6 flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-center border-b border-green-900 pb-3 mb-4">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="sliders" class="w-5 h-5 text-green-400"></i>
-                            <h3 class="font-cyber font-bold text-white text-base">KONFIGURÁCIA SENZOROV</h3>
-                        </div>
-                        <button id="btn-close-settings" class="text-zinc-400 hover:text-white">
-                            <i data-lucide="x" class="w-6 h-6"></i>
-                        </button>
-                    </div>
-
-                    <div class="space-y-4 text-xs">
+                    <form id="musicForm" onsubmit="handleGenerate(event)" class="space-y-4">
                         <div>
-                            <label class="text-green-400 block mb-1">CITLIVOSŤ SKENOVANIA CEZ STENY</label>
-                            <input type="range" min="1" max="100" value="85" class="w-full accent-green-500">
+                            <label class="block text-xs font-mono uppercase text-gray-400 mb-1">Názov Skladby (Title)</label>
+                            <input type="text" id="songTitle" required placeholder="napr. Cyber Neon Dreams" 
+                                class="w-full bg-black/50 border border-cyan-500/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400 text-white placeholder-gray-600 transition duration-200">
                         </div>
 
                         <div>
-                            <label class="text-green-400 block mb-1">ROZLÍŠENIE A KVALITA ZÁZNAMU</label>
-                            <select class="w-full bg-zinc-900 border border-green-800 rounded p-2 text-white outline-none">
-                                <option>1080p 60 FPS (Ultra Tactical HD)</option>
-                                <option>4K 30 FPS (Quantum Spectral Max)</option>
-                                <option>720p 120 FPS (High-Speed Paranormal)</option>
-                            </select>
+                            <label class="block text-xs font-mono uppercase text-gray-400 mb-1">Štýl & Kľúčové Slová (Style Tags)</label>
+                            <input type="text" id="songStyle" required placeholder="Synthwave, 128 BPM, Cyberpunk, Epic Solo, Female Vocal..." 
+                                class="w-full bg-black/50 border border-cyan-500/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400 text-white placeholder-gray-600 transition duration-200">
                         </div>
 
-                        <div class="space-y-2 pt-2">
-                            <div class="flex justify-between items-center bg-zinc-900 p-2.5 rounded border border-green-900">
-                                <span class="text-white">Zvukový modul Spirit Box</span>
-                                <input type="checkbox" checked class="accent-green-500 w-4 h-4">
-                            </div>
-                            <div class="flex justify-between items-center bg-zinc-900 p-2.5 rounded border border-green-900">
-                                <span class="text-white">Detekcia tepu cez prekážky</span>
-                                <input type="checkbox" checked class="accent-green-500 w-4 h-4">
-                            </div>
-                            <div class="flex justify-between items-center bg-zinc-900 p-2.5 rounded border border-green-900">
-                                <span class="text-white">Ektoplazmatický zosilňovač</span>
-                                <input type="checkbox" checked class="accent-green-500 w-4 h-4">
-                            </div>
+                        <div>
+                            <label class="block text-xs font-mono uppercase text-gray-400 mb-1">Text / Prompt / Inštrukcie pre skladbu</label>
+                            <textarea id="songLyrics" rows="5" required placeholder="[Verse 1]&#10;Neon lights in the rain...&#10;[Chorus]&#10;AQ Creator takes control..." 
+                                class="w-full bg-black/50 border border-cyan-500/30 rounded-xl p-4 text-sm focus:outline-none focus:border-cyan-400 text-white placeholder-gray-600 font-mono transition duration-200"></textarea>
                         </div>
+
+                        <button type="submit" id="genBtn" class="w-full py-4 rounded-xl font-bold uppercase tracking-widest text-black bg-gradient-to-r from-cyan-400 via-teal-300 to-pink-500 hover:opacity-90 shadow-[0_0_25px_rgba(0,242,254,0.5)] transition duration-300 flex items-center justify-center space-x-2">
+                            <i data-lucide="radio" class="w-5 h-5"></i>
+                            <span>GENERATE FREE TRACK</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Zoznam skladieb používateľa -->
+            <div class="lg:col-span-7 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-200 flex items-center gap-2">
+                        <i data-lucide="activity" class="text-pink-500 w-5 h-5"></i>
+                        Moje Skladby & Live Generovanie
+                    </h3>
+                    <span class="text-xs font-mono text-cyan-400/80 animate-pulse">● Live Cloud Stream</span>
+                </div>
+
+                <div id="userTracksList" class="space-y-4">
+                    <div class="text-center py-16 text-gray-500 border border-dashed border-gray-800 rounded-2xl glass-panel">
+                        <i data-lucide="music" class="w-12 h-12 mx-auto mb-3 opacity-30"></i>
+                        Zatiaľ žiadne skladby. Zadaj svoj prvý prompt!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ADMIN VIEW (ZABEZPEČENÝ) ================= -->
+        <div id="adminView" class="hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl border-pink-500/40 shadow-[0_0_30px_rgba(255,0,127,0.2)]">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-black text-pink-400 flex items-center gap-2">
+                            <i data-lucide="cpu" class="w-6 h-6"></i> ADMIN HUMAN-AI CORE
+                        </h2>
+                        <p class="text-xs text-gray-400">Live rada požiadaviek od používateľov z celého sveta. Nastav ETA a odošli hotový súbor.</p>
+                    </div>
+                    <div class="text-xs font-mono text-gray-400 bg-black/50 px-4 py-2 rounded-xl border border-gray-700">
+                        Max Audio: <span class="text-cyan-400 font-bold">180 MB</span> | Max Video: <span class="text-pink-400 font-bold">510 MB</span>
                     </div>
                 </div>
 
-                <button id="btn-save-settings" class="w-full py-3.5 bg-green-500 text-black font-cyber font-bold rounded text-xs tracking-wider">
-                    ULOŽIŤ A POKRAČOVAŤ V SKENOVANÍ
-                </button>
+                <div id="adminQueueList" class="space-y-4">
+                    <div class="text-center py-12 text-gray-500 font-mono">Žiadne čakajúce požiadavky v rade.</div>
+                </div>
             </div>
-
         </div>
+    </main>
 
+    <!-- Modal pre zadanie hesla -->
+    <div id="passwordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden">
+        <div class="glass-panel p-6 rounded-2xl max-w-sm w-full border border-pink-500/50 shadow-[0_0_30px_rgba(255,0,127,0.3)] space-y-4">
+            <div class="flex items-center space-x-2 text-pink-400">
+                <i data-lucide="lock" class="w-5 h-5"></i>
+                <h3 class="font-bold text-lg">Zabezpečený Prístup Admin</h3>
+            </div>
+            <p class="text-xs text-gray-400 font-mono">Zadaj tajné administrátorské heslo pre vstup do riadiaceho centra.</p>
+            <input type="password" id="adminPasswordInput" placeholder="Zadaj tajné heslo..." 
+                   class="w-full bg-black/60 border border-pink-500/40 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-400 text-white font-mono">
+            <div class="flex gap-2">
+                <button onclick="closeAuthModal()" class="w-1/2 py-2.5 rounded-xl bg-gray-800 text-gray-300 font-mono text-xs hover:bg-gray-700">Zrušiť</button>
+                <button onclick="verifyAdminPassword()" class="w-1/2 py-2.5 rounded-xl bg-pink-600 text-white font-mono text-xs font-bold hover:bg-pink-500">Odomknúť</button>
+            </div>
+        </div>
     </div>
 
-    <!-- ========================================================== -->
-    <!-- LOGIKA, AUDIO A THREE.JS SKRIPT -->
-    <!-- ========================================================== -->
+    <!-- Notifikačný Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none glass-panel px-6 py-4 rounded-xl border border-cyan-400 text-cyan-300 font-mono text-sm shadow-2xl flex items-center gap-3">
+        <i data-lucide="info" class="w-5 h-5"></i>
+        <span id="toastMsg">Notifikácia</span>
+    </div>
+
+    <!-- LOGIKA JAVASCRIPT -->
     <script>
-        lucide.createIcons();
+        /* ========================================================================
+           TAJNÉ HESLO PRE ADMINA (VIDÍTE HO IBA VY TU V KÓDE):
+           ======================================================================== */
+        const ADMIN_SECRET_KEY = "AQ#Admin_9842!CoreX";
 
-        // -----------------------------------------------------------
-        // 1. ZVUKOVÝ GENERÁTOR (Web Audio API)
-        // -----------------------------------------------------------
-        let audioCtx = null;
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // Inicializácia decentralizovanej Cloud DB (bez API kľúčov)
+        const gun = Gun(['https://gun-manhattan.herokuapp.com/gun', 'https://relay.peer.ooo/gun']);
+        const db = gun.get('aq_creator_music_ai_v3_secure');
+
+        // Limity súborov (v bytoch)
+        const MAX_AUDIO_SIZE = 180 * 1024 * 1024; // 180 MB
+        const MAX_VIDEO_SIZE = 510 * 1024 * 1024; // 510 MB
+
+        let isAdmin = false;
+
+        // Správa ID používateľa & Denného limitu
+        let userId = localStorage.getItem('aq_user_id');
+        if (!userId) {
+            userId = 'usr_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('aq_user_id', userId);
         }
 
-        function playGeigerSound() {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(900 + Math.random() * 600, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.02);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.02);
-        }
-
-        function playSonarPulse() {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
-        }
-
-        // -----------------------------------------------------------
-        // 2. INŠTALÁCIA: PRESNE 4 MINÚTY (240 SEKÚND) & 999 MB
-        // -----------------------------------------------------------
-        const totalDurationSec = 240; // 4 minúty
-        const totalMB = 999.0;
-        let elapsedSec = 0;
-
-        const terminalLogs = [
-            "Overovanie hardvérovej akcelerácie...",
-            "Alokácia spektro-optickej matice 1080p60...",
-            "Sťahovanie neurálneho balíka: neural_ghost_mesh_v5.bin",
-            "Kalibrácia prieniku cez tuhé prekážky (X-Ray Wall Penetration)...",
-            "Inštalácia sub-priestorových filtrov nočného videnia...",
-            "Synchronizácia LiDAR & Sonar frekvencií...",
-            "Ladenie ektoplazmatických anomálií...",
-            "Aktivácia Spirit-Box syntetizátora..."
-        ];
-
-        const installTimer = setInterval(() => {
-            elapsedSec += 0.5;
-            const progressRatio = Math.min(elapsedSec / totalDurationSec, 1);
-            
-            const currentMB = (progressRatio * totalMB).toFixed(2);
-            const currentPct = (progressRatio * 100).toFixed(1);
-
-            const remainingSec = Math.max(totalDurationSec - Math.floor(elapsedSec), 0);
-            const remMin = String(Math.floor(remainingSec / 60)).padStart(2, '0');
-            const remS = String(remainingSec % 60).padStart(2, '0');
-
-            document.getElementById('install-timer').innerText = `${remMin}:${remS}`;
-            document.getElementById('install-downloaded').innerText = `${currentMB} MB / 999.00 MB`;
-            document.getElementById('install-pct').innerText = `${currentPct}%`;
-            document.getElementById('install-bar').style.width = `${currentPct}%`;
-
-            // Pridávanie logov do terminálu
-            if (Math.random() > 0.7) {
-                const term = document.getElementById('install-terminal');
-                const log = terminalLogs[Math.floor(Math.random() * terminalLogs.length)];
-                const div = document.createElement('div');
-                div.innerText = `> [${remMin}:${remS}] ${log} (${(Math.random()*100).toFixed(0)}%)`;
-                term.appendChild(div);
-                term.scrollTop = term.scrollHeight;
+        function checkDailyCredits() {
+            const today = new Date().toISOString().slice(0, 10);
+            const usageData = JSON.parse(localStorage.getItem('aq_credits') || '{}');
+            if (usageData.date !== today) {
+                localStorage.setItem('aq_credits', JSON.stringify({ date: today, count: 0 }));
+                return 4;
             }
-
-            if (progressRatio >= 1) {
-                clearInterval(installTimer);
-                document.getElementById('btn-start-auth').classList.remove('hidden');
-                document.getElementById('install-timer').innerText = "DOKONČENÉ";
-            }
-        }, 500);
-
-        document.getElementById('btn-start-auth').addEventListener('click', () => {
-            initAudio();
-            document.getElementById('screen-install').classList.add('hidden');
-            document.getElementById('screen-auth').classList.remove('hidden');
-        });
-
-        document.getElementById('btn-login-submit').addEventListener('click', async () => {
-            initAudio();
-            document.getElementById('screen-auth').classList.add('hidden');
-            document.getElementById('screen-scanner').classList.remove('hidden');
-            await startCamera();
-            initThreeJS();
-            startScannerLoops();
-        });
-
-        // -----------------------------------------------------------
-        // 3. KAMERA & FILTRE
-        // -----------------------------------------------------------
-        const video = document.getElementById('camera-stream');
-
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
-                    audio: false
-                });
-                video.srcObject = stream;
-            } catch (err) {
-                console.warn("Kamera nedostupná, simuluje sa nočný obraz.", err);
-            }
+            return Math.max(0, 4 - usageData.count);
         }
 
-        function setFilter(filterClass) {
-            video.className = `absolute inset-0 w-full h-full object-cover transition-all duration-300 ${filterClass}`;
+        function useCredit() {
+            const today = new Date().toISOString().slice(0, 10);
+            const usageData = JSON.parse(localStorage.getItem('aq_credits') || '{}');
+            const count = (usageData.date === today ? usageData.count : 0) + 1;
+            localStorage.setItem('aq_credits', JSON.stringify({ date: today, count }));
+            updateCreditsUI();
         }
 
-        // -----------------------------------------------------------
-        // 4. 3D DUCHOVIA A MONŠTRÁ (THREE.JS)
-        // -----------------------------------------------------------
-        let scene, camera, renderer, ghostMesh, ghostCore;
-        let isGhostSpawned = false;
-
-        function initThreeJS() {
-            const canvas = document.getElementById('three-canvas');
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-            camera.position.z = 5;
-
-            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-
-            // Zložité 3D monštrum: Icosahedron + Wireframe ektoplazma
-            const geo = new THREE.IcosahedronGeometry(1.3, 2);
-            const mat = new THREE.MeshBasicMaterial({ color: 0x22c55e, wireframe: true, transparent: true, opacity: 0 });
-            ghostMesh = new THREE.Mesh(geo, mat);
-            scene.add(ghostMesh);
-
-            const coreGeo = new THREE.SphereGeometry(0.6, 16, 16);
-            const coreMat = new THREE.MeshBasicMaterial({ color: 0xff0044, wireframe: true, transparent: true, opacity: 0 });
-            ghostCore = new THREE.Mesh(coreGeo, coreMat);
-            ghostMesh.add(ghostCore);
-
-            renderLoop();
-        }
-
-        function renderLoop() {
-            requestAnimationFrame(renderLoop);
-            if (ghostMesh && isGhostSpawned) {
-                ghostMesh.rotation.x += 0.02;
-                ghostMesh.rotation.y += 0.025;
-                ghostMesh.position.x = Math.sin(Date.now() * 0.002) * 1.2;
-                ghostMesh.position.y = Math.cos(Date.now() * 0.0018) * 0.8;
-            }
-            renderer.render(scene, camera);
-        }
-
-        function spawnGhost() {
-            if (isGhostSpawned) return;
-            isGhostSpawned = true;
-            playSonarPulse();
-
-            let op = 0;
-            const fadeIn = setInterval(() => {
-                op += 0.08;
-                ghostMesh.material.opacity = op;
-                ghostCore.material.opacity = op * 1.2;
-                if (op >= 0.9) {
-                    clearInterval(fadeIn);
-                    setTimeout(despawnGhost, 6000);
-                }
-            }, 40);
-
-            document.getElementById('spirit-sub').innerText = "VAROVANIE: ENTITA DETEKOVANÁ V MIESTNOSTI!";
-        }
-
-        function despawnGhost() {
-            let op = ghostMesh.material.opacity;
-            const fadeOut = setInterval(() => {
-                op -= 0.08;
-                ghostMesh.material.opacity = op;
-                ghostCore.material.opacity = op;
-                if (op <= 0) {
-                    clearInterval(fadeOut);
-                    ghostMesh.material.opacity = 0;
-                    ghostCore.material.opacity = 0;
-                    isGhostSpawned = false;
-                    document.getElementById('spirit-sub').innerText = "SKENUJE SA ÉTER...";
-                }
-            }, 40);
-        }
-
-        document.getElementById('btn-spawn').addEventListener('click', spawnGhost);
-
-        // -----------------------------------------------------------
-        // 5. PRIENIK CEZ STENY & RADAROVÉ SKENOVANIE
-        // -----------------------------------------------------------
-        let wallMode = true;
-        const btnToggleWall = document.getElementById('btn-toggle-wall');
-        const wallTarget1 = document.getElementById('wall-human-target');
-        const wallTarget2 = document.getElementById('wall-specter-target');
-
-        btnToggleWall.addEventListener('click', () => {
-            wallMode = !wallMode;
-            playSonarPulse();
-            if (wallMode) {
-                wallTarget1.classList.remove('hidden');
-                wallTarget2.classList.remove('hidden');
-                btnToggleWall.className = "flex flex-col items-center gap-1 text-emerald-400 active:scale-95 transition";
-                document.getElementById('wall-radar-status').innerText = "AKTÍVNY • 2 CIELE";
+        function updateCreditsUI() {
+            const remaining = checkDailyCredits();
+            document.getElementById('creditsCount').innerText = `${remaining}/4`;
+            const btn = document.getElementById('genBtn');
+            if (remaining <= 0) {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.innerHTML = `<i data-lucide="lock" class="w-5 h-5"></i> <span>DENNÝ LIMIT VYČERPANÝ (4/4)</span>`;
             } else {
-                wallTarget1.classList.add('hidden');
-                wallTarget2.classList.add('hidden');
-                btnToggleWall.className = "flex flex-col items-center gap-1 text-zinc-600 active:scale-95 transition";
-                document.getElementById('wall-radar-status').innerText = "VYPNUTÝ";
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btn.innerHTML = `<i data-lucide="radio" class="w-5 h-5"></i> <span>GENERATE FREE TRACK</span>`;
             }
-        });
-
-        // Automatické zobrazenie cieľov cez stenu
-        wallTarget1.classList.remove('hidden');
-        wallTarget2.classList.remove('hidden');
-
-        function startScannerLoops() {
-            setInterval(() => {
-                if (Math.random() > 0.6) playGeigerSound();
-            }, 500);
+            lucide.createIcons();
         }
 
-        // -----------------------------------------------------------
-        // 6. NAHRÁVANIE VIDEA A STIAHNUTIE DO MOBILU
-        // -----------------------------------------------------------
-        let mediaRecorder;
-        let recordedChunks = [];
-        let isRecording = false;
-        let recInterval;
-        let recSeconds = 0;
+        // Lokálna pamäť na načítané skladby
+        const tracks = {};
 
-        const btnRecord = document.getElementById('btn-record');
-        const recBtnCore = document.getElementById('rec-btn-core');
-        const recTimer = document.getElementById('rec-timer');
-
-        btnRecord.addEventListener('click', () => {
-            if (!isRecording) startRecording();
-            else stopRecording();
+        // Sledovanie v reálnom čase z Cloudu
+        db.map().on((data, id) => {
+            if (!data) return;
+            tracks[id] = data;
+            renderUserTracks();
+            if (isAdmin) renderAdminTracks();
         });
 
-        async function startRecording() {
-            if (!video.srcObject) {
-                alert("Kamera nie je pripojená.");
+        // Vytvorenie požiadavky (Generate)
+        function handleGenerate(e) {
+            e.preventDefault();
+            if (checkDailyCredits() <= 0) {
+                showToast("Vyčerpal si limit 4 skladieb na dnes!", "error");
                 return;
             }
 
-            recordedChunks = [];
-            try {
-                mediaRecorder = new MediaRecorder(video.srcObject, {
-                    mimeType: 'video/webm;codecs=vp9',
-                    videoBitsPerSecond: 8000000 // Vysoká kvalita
+            const title = document.getElementById('songTitle').value.trim();
+            const style = document.getElementById('songStyle').value.trim();
+            const lyrics = document.getElementById('songLyrics').value.trim();
+
+            const trackId = 'track_' + Date.now();
+            const newTrack = {
+                id: trackId,
+                userId: userId,
+                title: title,
+                style: style,
+                lyrics: lyrics,
+                status: 'GENERATING',
+                eta: 'Pripravuje sa v štúdiu...',
+                fileUrl: '',
+                fileType: '',
+                createdAt: new Date().toLocaleTimeString()
+            };
+
+            db.get(trackId).put(newTrack);
+            useCredit();
+            document.getElementById('musicForm').reset();
+            showToast("Požiadavka odoslaná Adminovi do AI Core!");
+        }
+
+        // Vykreslenie skladieb používateľa
+        function renderUserTracks() {
+            const list = document.getElementById('userTracksList');
+            const myTracks = Object.values(tracks)
+                .filter(t => t.userId === userId)
+                .sort((a, b) => (b.id > a.id ? 1 : -1));
+
+            if (myTracks.length === 0) return;
+
+            list.innerHTML = '';
+            myTracks.forEach(t => {
+                const isReady = t.status === 'READY';
+                const card = document.createElement('div');
+                card.className = `glass-panel p-5 rounded-2xl border transition-all ${isReady ? 'border-cyan-400 shadow-[0_0_15px_rgba(0,242,254,0.3)]' : 'border-yellow-500/30'}`;
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-bold text-lg text-white flex items-center gap-2">
+                                ${t.title}
+                                ${isReady 
+                                    ? '<span class="text-xs bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded-full border border-cyan-500/40">READY</span>' 
+                                    : '<span class="text-xs bg-yellow-500/20 text-yellow-300 px-2.5 py-0.5 rounded-full border border-yellow-500/40 animate-pulse">GENERATING</span>'
+                                }
+                            </h4>
+                            <p class="text-xs text-pink-400 font-mono mt-1">${t.style}</p>
+                        </div>
+                        <span class="text-xs text-gray-500 font-mono">${t.createdAt}</span>
+                    </div>
+
+                    <div class="bg-black/40 p-3 rounded-xl mb-4 text-xs font-mono text-gray-400 max-h-20 overflow-y-auto whitespace-pre-wrap border border-gray-800">
+                        ${t.lyrics}
+                    </div>
+
+                    ${!isReady ? `
+                        <div class="flex items-center space-x-3 bg-yellow-950/20 p-3 rounded-xl border border-yellow-500/20">
+                            <div class="w-4 h-4 rounded-full border-2 border-yellow-400 border-t-transparent animate-spin"></div>
+                            <div class="text-xs font-mono text-yellow-300">
+                                Odhadovaný čas (ETA): <span class="font-bold text-white">${t.eta || 'Čaká na spracovanie'}</span>
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="space-y-3 pt-2">
+                            ${t.fileType && t.fileType.includes('video') ? `
+                                <video src="${t.fileUrl}" controls class="w-full rounded-xl max-h-60 bg-black"></video>
+                            ` : `
+                                <audio src="${t.fileUrl}" controls class="w-full h-10 rounded-lg"></audio>
+                            `}
+                            
+                            <a href="${t.fileUrl}" download="${t.title}.${t.fileType && t.fileType.includes('video') ? 'mp4' : 'mp3'}" 
+                               class="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono text-xs flex items-center justify-center space-x-2 transition">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                                <span>STIAHNUŤ SKLADBU (ZADARMO)</span>
+                            </a>
+                        </div>
+                    `}
+                `;
+                list.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // Vykreslenie pre Admina
+        function renderAdminTracks() {
+            const list = document.getElementById('adminQueueList');
+            const allTracks = Object.values(tracks).sort((a, b) => (b.id > a.id ? 1 : -1));
+
+            if (allTracks.length === 0) return;
+
+            list.innerHTML = '';
+            allTracks.forEach(t => {
+                const card = document.createElement('div');
+                card.className = "p-5 rounded-2xl bg-black/60 border border-pink-500/30 space-y-4";
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs text-gray-500 font-mono">ID: ${t.id} | Užívateľ: ${t.userId}</span>
+                            <h4 class="text-lg font-bold text-white">${t.title}</h4>
+                            <p class="text-xs text-cyan-400 font-mono">${t.style}</p>
+                        </div>
+                        <span class="text-xs px-2.5 py-1 rounded bg-pink-950/60 text-pink-300 font-mono border border-pink-500/30">${t.status}</span>
+                    </div>
+
+                    <div class="p-3 bg-gray-900 rounded-xl text-xs font-mono text-gray-300 whitespace-pre-wrap max-h-24 overflow-y-auto">
+                        ${t.lyrics}
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-800">
+                        <!-- Nastavenie ETA -->
+                        <div class="flex gap-2">
+                            <input type="text" id="eta_${t.id}" placeholder="napr. 5 minút" value="${t.eta !== 'Pripravuje sa v štúdiu...' ? t.eta : ''}"
+                                class="bg-black/50 border border-gray-700 rounded-lg px-3 py-1 text-xs text-white flex-1 focus:outline-none focus:border-pink-400">
+                            <button onclick="updateETA('${t.id}')" class="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-mono">
+                                Nastaviť ETA
+                            </button>
+                        </div>
+
+                        <!-- Nahrávanie Audio / Video -->
+                        <div class="flex items-center gap-2">
+                            <input type="file" id="file_${t.id}" accept="audio/*,video/*" class="text-xs text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-cyan-500/20 file:text-cyan-300 file:text-xs">
+                            <button onclick="uploadFinishedTrack('${t.id}')" class="px-3 py-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-lg text-xs font-mono">
+                                Dokončiť & Odoslať
+                            </button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function updateETA(id) {
+            const etaVal = document.getElementById(`eta_${id}`).value;
+            db.get(id).get('eta').put(etaVal);
+            showToast("ETA čas bol aktualizovaný!");
+        }
+
+        function uploadFinishedTrack(id) {
+            const fileInput = document.getElementById(`file_${id}`);
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showToast("Najskôr vyber súbor (audio alebo video)!", "error");
+                return;
+            }
+
+            if (file.type.includes('audio') && file.size > MAX_AUDIO_SIZE) {
+                showToast("Audio presahuje maximálnu veľkosť 180 MB!", "error");
+                return;
+            }
+            if (file.type.includes('video') && file.size > MAX_VIDEO_SIZE) {
+                showToast("Video presahuje maximálnu veľkosť 510 MB!", "error");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const fileDataUrl = e.target.result;
+                db.get(id).put({
+                    fileUrl: fileDataUrl,
+                    fileType: file.type,
+                    status: 'READY',
+                    eta: 'Dokončené'
                 });
+                showToast("Skladba bola úspešne odoslaná používateľovi!");
+            };
+            reader.readAsDataURL(file);
+        }
 
-                mediaRecorder.ondataavailable = (e) => {
-                    if (e.data.size > 0) recordedChunks.push(e.data);
-                };
+        // Správa autentifikácie Admina
+        function handleAdminAuth() {
+            if (isAdmin) {
+                // Prepnutie späť do User módu
+                isAdmin = false;
+                toggleView();
+                return;
+            }
+            // Otvorenie modalu na heslo
+            document.getElementById('passwordModal').classList.remove('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('adminPasswordInput').focus();
+        }
 
-                mediaRecorder.onstop = saveVideo;
-                mediaRecorder.start();
+        function closeAuthModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+        }
 
-                isRecording = true;
-                recBtnCore.className = "w-14 h-14 bg-red-600 rounded-lg flex items-center justify-center animate-pulse";
-                recTimer.classList.remove('hidden');
-                recSeconds = 0;
-
-                recInterval = setInterval(() => {
-                    recSeconds++;
-                    const m = String(Math.floor(recSeconds / 60)).padStart(2, '0');
-                    const s = String(recSeconds % 60).padStart(2, '0');
-                    recTimer.innerText = `${m}:${s}`;
-                }, 1000);
-
-            } catch (err) {
-                alert("Váš prehliadač vyžaduje HTTPS alebo lokálny server pre nahrávanie.");
+        function verifyAdminPassword() {
+            const input = document.getElementById('adminPasswordInput').value;
+            if (input === ADMIN_SECRET_KEY) {
+                isAdmin = true;
+                closeAuthModal();
+                toggleView();
+                renderAdminTracks();
+                showToast("Admin prístup úspešne autorizovaný!");
+            } else {
+                showToast("Nesprávne heslo! Prístup zamietnutý.", "error");
+                document.getElementById('adminPasswordInput').value = '';
             }
         }
 
-        function stopRecording() {
-            mediaRecorder.stop();
-            isRecording = false;
-            clearInterval(recInterval);
-            recBtnCore.className = "w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg shadow-red-600/50";
-            recTimer.classList.add('hidden');
+        function toggleView() {
+            document.getElementById('userView').classList.toggle('hidden', isAdmin);
+            document.getElementById('adminView').classList.toggle('hidden', !isAdmin);
+            
+            document.getElementById('modeText').innerText = isAdmin ? 'User Studio' : 'Admin Core';
+            document.getElementById('modeToggleBtn').classList.toggle('border-pink-500', isAdmin);
+            document.getElementById('modeToggleBtn').classList.toggle('text-pink-300', isAdmin);
+            lucide.createIcons();
         }
 
-        function saveVideo() {
-            const blob = new Blob(recordedChunks, { type: 'video/mp4' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `SPECTER_NIGHT_VISION_${Date.now()}.mp4`;
-            document.body.appendChild(a);
-            a.click();
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => {
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            }, 100);
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
         }
 
-        // -----------------------------------------------------------
-        // 7. NASTAVENIA MODAL
-        // -----------------------------------------------------------
-        const modalSettings = document.getElementById('modal-settings');
-        document.getElementById('btn-open-settings').addEventListener('click', () => modalSettings.classList.remove('hidden'));
-        document.getElementById('btn-close-settings').addEventListener('click', () => modalSettings.classList.add('hidden'));
-        document.getElementById('btn-save-settings').addEventListener('click', () => modalSettings.classList.add('hidden'));
+        // Klávesa ENTER pri zadávaní hesla
+        document.getElementById('adminPasswordInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') verifyAdminPassword();
+        });
+
+        // Štart
+        updateCreditsUI();
+        lucide.createIcons();
     </script>
 </body>
 </html>
