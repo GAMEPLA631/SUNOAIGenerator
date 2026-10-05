@@ -1,1059 +1,1026 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="sk" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FaceDanker // Ultra-Fast Global Network</title>
-    <!-- Tailwind CSS -->
+    <title>TubeChat Network // Next-Gen Creator & Fan Community</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Ikony -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Paho MQTT cez Secure WebSockets -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
-
-    <style>
-        :root {
-            --neon-cyan: #00f3ff;
-            --neon-pink: #ff0055;
-            --neon-purple: #9d00ff;
-            --bg-dark: #05070e;
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        yt: {
+                            red: '#FF0000',
+                            glow: '#ff3333',
+                            dark: '#08080c',
+                            card: 'rgba(18, 18, 24, 0.75)',
+                            border: 'rgba(255, 0, 0, 0.2)'
+                        }
+                    },
+                    fontFamily: {
+                        cyber: ['Rajdhani', 'sans-serif'],
+                        main: ['Inter', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'neon': '0 0 15px rgba(255, 0, 0, 0.4)',
+                        'neon-strong': '0 0 25px rgba(255, 0, 0, 0.75)'
+                    }
+                }
+            }
         }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Paho MQTT Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <style>
         body {
-            background-color: var(--bg-dark);
-            font-family: 'Rajdhani', sans-serif;
-            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            background-color: #08080c;
+            color: #e5e7eb;
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(157, 0, 255, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(0, 243, 255, 0.1) 0%, transparent 40%);
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 0, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 0, 0.03) 0%, transparent 40%);
             background-attachment: fixed;
         }
-        .orbitron { font-family: 'Orbitron', sans-serif; }
-        
+        .font-cyber { font-family: 'Rajdhani', sans-serif; }
         .glass-panel {
-            background: rgba(13, 19, 33, 0.78);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+            background: rgba(16, 16, 22, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
         }
-        .glass-panel-admin {
-            background: rgba(22, 10, 26, 0.95);
-            border: 1px solid rgba(255, 0, 85, 0.4);
-            box-shadow: 0 0 30px rgba(255, 0, 85, 0.25);
+        .glass-panel-yt {
+            background: rgba(22, 12, 14, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 0, 0, 0.25);
         }
-        .file-upload-box {
-            border: 2px dashed rgba(0, 243, 255, 0.35);
-            transition: all 0.2s ease;
-        }
-        .file-upload-box:hover {
-            border-color: var(--neon-cyan);
-            background: rgba(0, 243, 255, 0.08);
-        }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #05070e; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF0000; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="h-screen flex flex-col overflow-hidden select-none">
 
-    <!-- HORNÁ LIŠTA -->
-    <header class="glass-panel sticky top-0 z-50 px-4 lg:px-8 py-3 flex justify-between items-center border-b border-cyan-500/20">
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('feed')">
-            <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-cyan-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                <i class="fa-solid fa-bolt-lightning text-white text-xl animate-pulse"></i>
+    <!-- Top Navigation Bar -->
+    <header class="glass-panel border-b border-yt-border px-4 py-3 flex items-center justify-between z-20">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-yt-red flex items-center justify-center text-white shadow-neon">
+                <i class="fab fa-youtube text-2xl"></i>
             </div>
             <div>
-                <span class="orbitron text-2xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-purple-300 to-pink-500">FaceDanker</span>
-                <span class="hidden md:inline-block text-[10px] text-cyan-400/80 orbitron ml-2 border border-cyan-500/30 px-1.5 py-0.5 rounded">TURBO SYNC</span>
+                <h1 class="text-xl font-cyber font-bold tracking-wider text-white flex items-center gap-2">
+                    TUBE<span class="text-yt-red">CHAT</span> 
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-red-950/80 border border-yt-red text-yt-red">NETWORK v1.0</span>
+                </h1>
+                <p class="text-xs text-gray-400 hidden sm:block">Exkluzívna Real-Time platforma pre YouTuberov a Fanúšikov</p>
             </div>
         </div>
 
+        <!-- Connection Status & User Profile Widget -->
         <div class="flex items-center space-x-3">
-            <div id="mqtt-status" class="flex items-center text-xs orbitron text-yellow-400 bg-yellow-400/10 px-3 py-1 rounded-full border border-yellow-400/30">
-                <span class="w-2 h-2 rounded-full bg-yellow-400 mr-2 animate-ping"></span> EMQX Spájanie...
+            <div id="mqtt-status" class="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-yellow-950/40 border border-yellow-600/50 text-yellow-500 text-xs font-medium">
+                <span class="w-2 h-2 rounded-full bg-yellow-500 animate-ping"></span>
+                <span class="status-text hidden md:inline">Pripájanie...</span>
             </div>
 
-            <!-- Admin Prístup -->
-            <button onclick="openAdminAuthModal()" title="Admin Gateway" class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 text-slate-400 hover:text-pink-400 hover:border-pink-500/50 flex items-center justify-center transition">
-                <i class="fa-solid fa-fingerprint text-base"></i>
-            </button>
+            <div id="user-pill" class="hidden items-center space-x-2 bg-gray-900/80 border border-gray-800 px-3 py-1.5 rounded-xl">
+                <div id="user-avatar-badge" class="relative">
+                    <div class="w-7 h-7 rounded-lg bg-gray-800 flex items-center justify-center font-bold text-white text-xs" id="user-initials">?</div>
+                </div>
+                <div class="text-left hidden sm:block">
+                    <div class="text-xs font-bold text-white flex items-center gap-1">
+                        <span id="user-display-name">Username</span>
+                        <span id="user-role-badge"></span>
+                    </div>
+                    <div class="text-[10px] text-gray-400" id="user-display-role">Fanúšik</div>
+                </div>
+                <button onclick="App.logout()" title="Odhlásiť sa" class="text-gray-400 hover:text-yt-red ml-2 transition">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
 
-            <div id="auth-actions" class="flex items-center space-x-2"></div>
+            <button id="btn-open-auth" onclick="App.showAuthModal()" class="px-4 py-1.5 rounded-lg bg-yt-red hover:bg-red-600 font-semibold text-xs tracking-wider uppercase text-white shadow-neon transition">
+                <i class="fas fa-user-circle mr-1"></i> Vstúpiť
+            </button>
         </div>
     </header>
 
-    <!-- HLAVNÁ ČASŤ -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- Main Workspace -->
+    <div class="flex-1 flex overflow-hidden">
 
-        <!-- ĽAVÝ PANEL -->
-        <aside class="lg:col-span-1 space-y-6">
-            <div id="user-quick-card" class="glass-panel p-5 rounded-2xl text-center relative overflow-hidden"></div>
-
-            <nav class="glass-panel p-3 rounded-2xl space-y-1 font-semibold text-sm">
-                <button onclick="showSection('feed')" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl hover:bg-cyan-500/10 hover:text-cyan-400 transition text-left">
-                    <i class="fa-solid fa-globe text-base"></i>
-                    <span>Verejný Stream</span>
-                </button>
-                <button onclick="showSection('profile')" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl hover:bg-cyan-500/10 hover:text-cyan-400 transition text-left">
-                    <i class="fa-solid fa-id-badge text-base"></i>
-                    <span>Môj Profil</span>
-                </button>
-                <button id="admin-nav-btn" onclick="showSection('admin')" class="hidden w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/40 transition">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-terminal text-base"></i>
-                        <span class="orbitron text-xs tracking-wider">SuperAdmin HUD</span>
-                    </div>
-                    <span id="admin-req-badge" class="hidden bg-pink-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-bounce">0</span>
-                </button>
-            </nav>
-
-            <!-- ODPORÚČANIE PROFILOV -->
-            <div class="glass-panel p-4 rounded-2xl space-y-3">
-                <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2">
-                    <h3 class="orbitron text-xs text-cyan-400 font-bold flex items-center gap-1.5">
-                        <i class="fa-solid fa-microchip text-pink-500"></i> AI Match Algoritmus
+        <!-- Sidebar: Rooms & Online Creators -->
+        <aside class="w-64 glass-panel border-r border-gray-900 flex-shrink-0 flex flex-col justify-between hidden md:flex">
+            <div class="p-4 space-y-6 overflow-y-auto">
+                <!-- Chat Rooms -->
+                <div>
+                    <h3 class="text-xs font-cyber tracking-widest text-gray-400 uppercase mb-2 flex items-center justify-between">
+                        <span>Miestnosti</span>
+                        <i class="fas fa-hashtag text-[10px] text-yt-red"></i>
                     </h3>
-                    <span class="text-[10px] text-slate-400 orbitron">LIVE</span>
-                </div>
-                <div id="recommended-list" class="space-y-3 pt-1"></div>
-            </div>
-        </aside>
-
-        <!-- STREDNÝ OBSAH -->
-        <section class="lg:col-span-3 space-y-6">
-
-            <!-- 1. FEED SEKCIA -->
-            <div id="sec-feed" class="space-y-6">
-                
-                <!-- RÝCHLE PUBLIKOVANIE -->
-                <div class="glass-panel p-5 rounded-2xl space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="orbitron text-xs font-bold text-cyan-400 flex items-center gap-2">
-                            <i class="fa-solid fa-bolt"></i> Okamžité Zverejnenie Médii
-                        </span>
-                        <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Bleskový Globálny Feed</span>
-                    </div>
-
-                    <input id="post-title" type="text" placeholder="Napíš popis alebo názov médií..." class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-cyan-400">
-
-                    <!-- VÝBER SÚBOROV ZO ZARIADENIA -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div class="file-upload-box rounded-xl p-3 text-center cursor-pointer relative flex flex-col items-center justify-center bg-slate-900/50" onclick="document.getElementById('post-img-file').click()">
-                            <input type="file" id="post-img-file" accept="image/*" class="hidden" onchange="handleImageSelection(event)">
-                            <i class="fa-solid fa-image text-2xl text-cyan-400 mb-1"></i>
-                            <span id="img-upload-status" class="text-xs font-bold text-slate-300">Nahrať fotku zo zariadenia</span>
-                            <span class="text-[10px] text-slate-500">JPG, PNG, GIF (Okamžitá kompresia)</span>
-                        </div>
-
-                        <div class="file-upload-box rounded-xl p-3 text-center cursor-pointer relative flex flex-col items-center justify-center bg-slate-900/50" onclick="document.getElementById('post-audio-file').click()">
-                            <input type="file" id="post-audio-file" accept="audio/*" class="hidden" onchange="handleAudioSelection(event)">
-                            <i class="fa-solid fa-music text-2xl text-purple-400 mb-1"></i>
-                            <span id="audio-upload-status" class="text-xs font-bold text-slate-300">Nahrať MP3 zo zariadenia</span>
-                            <span class="text-[10px] text-slate-500">Alebo vlož MP3 URL nižšie</span>
-                        </div>
-                    </div>
-
-                    <input id="post-audio-url" type="text" placeholder="Voliteľné: Priama URL na MP3 (https://...mp3)" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-1.5 text-xs focus:outline-none focus:border-purple-400">
-
-                    <!-- Náhľad vybratého obrázku -->
-                    <div id="image-preview-box" class="hidden relative rounded-xl overflow-hidden max-h-48 border border-cyan-500/40 bg-black flex items-center justify-center">
-                        <img id="image-preview-elem" src="" alt="Náhľad" class="max-h-48 object-contain">
-                        <button onclick="clearSelectedImage()" class="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg hover:bg-red-500">✕</button>
-                    </div>
-
-                    <div class="flex justify-between items-center pt-2">
-                        <span class="text-[11px] text-slate-400"><i class="fa-solid fa-shield-halved text-cyan-400"></i> FaceDanker Shield</span>
-                        <button id="btn-publish" onclick="publishPost()" class="orbitron bg-gradient-to-r from-cyan-500 to-purple-600 hover:opacity-90 text-slate-950 font-bold px-8 py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-cyan-500/30">
-                            Zverejniť Teraz
+                    <div class="space-y-1" id="rooms-list">
+                        <button onclick="App.switchRoom('general')" data-room="general" class="room-btn w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between transition bg-yt-red/20 text-white border border-yt-red/40 font-medium">
+                            <span class="flex items-center gap-2"><i class="fas fa-comments text-yt-red"></i> #general-lounge</span>
+                        </button>
+                        <button onclick="App.switchRoom('creators-only')" data-room="creators-only" class="room-btn w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between transition text-gray-400 hover:text-white hover:bg-gray-900/40">
+                            <span class="flex items-center gap-2"><i class="fas fa-crown text-yellow-500"></i> #creators-only</span>
+                            <i class="fas fa-lock text-xs text-gray-600"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- FEED CONTAINER -->
-                <div id="posts-container" class="space-y-6"></div>
+                <!-- YouTuber List -->
+                <div>
+                    <h3 class="text-xs font-cyber tracking-widest text-gray-400 uppercase mb-2 flex items-center justify-between">
+                        <span>Overení YouTuberi</span>
+                        <span id="creators-count" class="text-xs text-yt-red font-bold">0</span>
+                    </h3>
+                    <div class="space-y-2" id="verified-creators-list">
+                        <div class="text-xs text-gray-500 italic p-2 text-center">Zatiaľ žiadni schválení YouTuberi</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- 2. PROFIL SEKCIA -->
-            <div id="sec-profile" class="hidden glass-panel p-6 rounded-2xl space-y-6">
-                <div class="flex justify-between items-center border-b border-cyan-500/20 pb-4 flex-wrap gap-3">
-                    <div>
-                        <h2 class="orbitron text-2xl font-bold text-white flex items-center gap-2">
-                            <span id="prof-name">Užívateľ</span>
-                            <span id="prof-badge" class="hidden text-cyan-400 text-lg"><i class="fa-solid fa-circle-check"></i></span>
-                        </h2>
-                        <p id="prof-email" class="text-xs text-slate-400"></p>
+            <!-- Bottom Tools (Admin & Verification Button) -->
+            <div class="p-3 border-t border-gray-900 space-y-2">
+                <button id="btn-request-verify" onclick="App.showVerificationModal()" class="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-red-950 to-neutral-900 hover:from-yt-red hover:to-red-700 border border-yt-red/50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fab fa-youtube text-sm text-yt-red group-hover:text-white"></i> Požiadať o YouTuber Odznak
+                </button>
+                <button id="btn-admin-toggle" onclick="App.toggleAdminPanel()" class="w-full py-1.5 px-3 rounded-lg bg-gray-900/90 hover:bg-gray-800 text-gray-400 hover:text-white text-xs border border-gray-800 transition flex items-center justify-between">
+                    <span><i class="fas fa-shield-alt text-yellow-500 mr-1.5"></i> Admin Konzola</span>
+                    <span id="pending-badge" class="hidden px-1.5 py-0.2 rounded-full bg-yt-red text-white text-[10px] font-bold">0</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Central Chat Stream Area -->
+        <main class="flex-1 flex flex-col glass-panel relative">
+            <!-- Room Header -->
+            <div class="h-12 border-b border-gray-900 px-4 flex items-center justify-between bg-black/40">
+                <div class="flex items-center space-x-2">
+                    <span class="text-gray-400 font-mono text-sm">#</span>
+                    <h2 id="current-room-title" class="text-sm font-bold text-white tracking-wide uppercase font-cyber">general-lounge</h2>
+                    <span id="room-desc" class="text-xs text-gray-500 hidden sm:inline">| Verejná diskusia YouTuberov a Fanúšikov</span>
+                </div>
+                <div class="flex items-center space-x-2 text-xs text-gray-400">
+                    <i class="fas fa-shield-halved text-yt-red"></i>
+                    <span class="text-[11px] uppercase tracking-wider text-gray-400">Len Text a Emoji</span>
+                </div>
+            </div>
+
+            <!-- Messages Stream Area -->
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3">
+                <div class="text-center my-6">
+                    <div class="inline-block px-4 py-1.5 rounded-full bg-gray-900/60 border border-gray-800 text-xs text-gray-400">
+                        <i class="fas fa-bolt text-yt-red mr-1"></i> Pripojené k EMQX Global WSS Brokeru.
                     </div>
-                    <button onclick="sendVerificationRequest()" class="orbitron text-xs bg-slate-900 border border-cyan-500/50 text-cyan-300 hover:bg-cyan-500/20 px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-lg shadow-cyan-500/10">
-                        <i class="fa-solid fa-award text-sm"></i> Požiadať Admina o Overenú Fajku
+                </div>
+            </div>
+
+            <!-- Text Input Area (STRICT TEXT ONLY) -->
+            <div class="p-3 bg-black/80 border-t border-gray-900">
+                <form id="chat-form" onsubmit="App.sendMessage(event)" class="flex items-center gap-2">
+                    <div class="relative flex-1">
+                        <input type="text" id="chat-input" maxlength="280" placeholder="Napíš správu pre komunitu... (Obrázky nie sú povolené!)" 
+                               class="w-full bg-gray-950/90 border border-gray-800 focus:border-yt-red focus:ring-1 focus:ring-yt-red rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none transition">
+                        <span id="char-counter" class="absolute right-3 top-3 text-[10px] text-gray-500">280</span>
+                    </div>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-yt-red hover:bg-red-600 text-white font-semibold text-sm transition shadow-neon flex items-center justify-center">
+                        <i class="fas fa-paper-plane mr-1 sm:mr-2"></i>
+                        <span class="hidden sm:inline">Odoslať</span>
                     </button>
+                </form>
+                <div class="mt-1 flex items-center justify-between text-[11px] text-gray-500 px-1">
+                    <span>💡 Tip: Slušné správanie v chate je monitorované v reálnom čase.</span>
+                    <span class="text-yt-red"><i class="fas fa-ban mr-1"></i>Upload fotiek do chatu je trvalo blokovaný</span>
                 </div>
+            </div>
+        </main>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-                        <label class="text-xs text-cyan-400 orbitron">Miesto Narodenia</label>
-                        <input id="prof-birthplace" type="text" class="w-full bg-transparent border-b border-slate-700 py-1.5 text-sm focus:outline-none focus:border-cyan-400" placeholder="Mesto, Štát">
-                    </div>
-                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-                        <label class="text-xs text-cyan-400 orbitron">Aktuálne Bydlisko</label>
-                        <input id="prof-living" type="text" class="w-full bg-transparent border-b border-slate-700 py-1.5 text-sm focus:outline-none focus:border-cyan-400" placeholder="Kde bývaš teraz">
-                    </div>
-                    <div class="md:col-span-2 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-                        <label class="text-xs text-cyan-400 orbitron">Záujmy / Čo mám rád (pre AI Odporúčania)</label>
-                        <textarea id="prof-likes" rows="2" class="w-full bg-transparent border-b border-slate-700 py-1.5 text-sm focus:outline-none focus:border-cyan-400" placeholder="Napr. Synthwave, Fotografia, 3D Umenie, Cyberpunk..."></textarea>
-                    </div>
+        <!-- Admin God-Mode Panel (Sliding Drawer / Overlay) -->
+        <aside id="admin-panel" class="w-96 glass-panel-yt border-l border-yt-red/40 flex-shrink-0 flex flex-col justify-between hidden z-30 transition-all duration-300">
+            <div class="p-4 border-b border-yt-red/30 flex items-center justify-between bg-black/60">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-shield-virus text-yt-red text-lg"></i>
+                    <h2 class="font-cyber font-bold text-white text-base tracking-wider">GOD-MODE ADMIN PANEL</h2>
                 </div>
-
-                <button onclick="saveProfile()" class="orbitron text-xs bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl transition">
-                    Uložiť a Zosynchronizovať Údaje
+                <button onclick="App.toggleAdminPanel()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
 
-            <!-- 3. ADMIN PANEL (GOD-MODE) -->
-            <div id="sec-admin" class="hidden space-y-6">
-                <div class="glass-panel-admin p-6 rounded-2xl space-y-6">
-                    <div class="flex items-center justify-between border-b border-pink-500/30 pb-4">
-                        <div>
-                            <h2 class="orbitron text-xl font-bold text-pink-500 flex items-center gap-2">
-                                <i class="fa-solid fa-biohazard"></i> SuperAdmin Master HUD
-                            </h2>
-                            <p class="text-[11px] text-pink-400/80 font-mono">Core Access Protocol: AQ#Admin_9842!CoreX ACTIVE</p>
+            <!-- Admin Content Tabs -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                <!-- Section 1: YouTuber Verification Requests -->
+                <div>
+                    <h3 class="text-xs font-cyber tracking-widest text-yt-red uppercase font-bold mb-3 flex items-center justify-between">
+                        <span><i class="fas fa-id-card mr-1"></i> Čakajúce Žiadosti YouTuberov</span>
+                        <span id="admin-requests-count" class="px-2 py-0.5 rounded bg-yt-red text-white text-xs">0</span>
+                    </h3>
+                    <div id="admin-verification-list" class="space-y-3">
+                        <div class="text-xs text-gray-400 italic text-center p-4 border border-gray-900 rounded-xl bg-black/40">
+                            Žiadne čakajúce verifikácie.
                         </div>
-                        <button onclick="logoutAdmin()" class="orbitron text-xs bg-red-600/30 text-red-300 border border-red-500 px-3 py-1 rounded-lg">Uzamknúť HUD</button>
                     </div>
+                </div>
 
-                    <!-- 1. Žiadosti o overenú fajku -->
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <h3 class="orbitron text-xs font-bold text-cyan-400 flex items-center gap-2">
-                                <i class="fa-solid fa-award"></i> Žiadosti o Overenie (Modrá Fajka)
-                            </h3>
-                            <span id="admin-verify-count" class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/40">0 Žiadostí</span>
-                        </div>
-                        <div id="admin-verify-list" class="space-y-2"></div>
-                    </div>
-
-                    <!-- 2. Všetci Používatelia siete -->
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <h3 class="orbitron text-xs font-bold text-pink-400 flex items-center gap-2">
-                                <i class="fa-solid fa-users-gear"></i> Všetci Používatelia v Sieti (God Mode)
-                            </h3>
-                            <span id="admin-user-count" class="text-[10px] bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded border border-pink-500/40">0 Používateľov</span>
-                        </div>
-                        <div id="admin-users-table" class="space-y-3"></div>
-                    </div>
-
-                    <!-- 3. Moderácia Príspevkov -->
-                    <div class="space-y-3">
-                        <h3 class="orbitron text-xs font-bold text-purple-400 flex items-center gap-2">
-                            <i class="fa-solid fa-shield-cat"></i> Všetky Príspevky a Autorské Práva (DMCA)
-                        </h3>
-                        <div id="admin-posts-list" class="space-y-2"></div>
+                <!-- Section 2: Global Users Moderation -->
+                <div>
+                    <h3 class="text-xs font-cyber tracking-widest text-gray-300 uppercase font-bold mb-3 flex items-center justify-between">
+                        <span><i class="fas fa-users-cog mr-1"></i> Správa Používateľov</span>
+                        <span id="admin-users-count" class="text-xs text-gray-500">0</span>
+                    </h3>
+                    <div id="admin-users-list" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                        <!-- Populated by JS -->
                     </div>
                 </div>
             </div>
 
-        </section>
-    </main>
-
-    <!-- ADMIN LOGIN MODAL -->
-    <div id="admin-auth-modal" class="fixed inset-0 bg-black/85 backdrop-blur-lg flex items-center justify-center hidden z-50 p-4">
-        <div class="glass-panel-admin max-w-sm w-full p-6 rounded-2xl border border-pink-500/50 space-y-4 text-center">
-            <i class="fa-solid fa-shield-virus text-pink-500 text-3xl animate-pulse"></i>
-            <h3 class="orbitron text-lg font-bold text-white">Admin Core Verification</h3>
-            <p class="text-xs text-slate-400">Zadaj autorizačný kód siete FaceDanker.</p>
-            
-            <input id="admin-key-input" type="password" placeholder="Vlož Core kľúč..." class="w-full bg-slate-950 border border-pink-500/50 rounded-xl px-4 py-2.5 text-center text-sm font-mono tracking-widest text-pink-400 focus:outline-none">
-            
-            <div class="flex gap-2">
-                <button onclick="closeAdminAuthModal()" class="w-1/2 bg-slate-800 text-slate-300 py-2 rounded-xl text-xs orbitron">Zrušiť</button>
-                <button onclick="verifyAdminKey()" class="w-1/2 bg-pink-600 hover:bg-pink-500 text-white font-bold py-2 rounded-xl text-xs orbitron">Overiť</button>
+            <!-- Admin Footer Commands -->
+            <div class="p-4 border-t border-yt-red/30 bg-black/60 space-y-2">
+                <button onclick="App.adminBroadcastAlert()" class="w-full py-1.5 px-3 rounded-lg bg-yellow-950/60 border border-yellow-600/50 hover:bg-yellow-900 text-yellow-400 text-xs font-bold transition flex items-center justify-center gap-2">
+                    <i class="fas fa-bullhorn"></i> Odoslať Globálne Hlásenie
+                </button>
+                <button onclick="App.adminClearChat()" class="w-full py-1.5 px-3 rounded-lg bg-red-950/60 border border-yt-red hover:bg-yt-red text-white text-xs font-bold transition flex items-center justify-center gap-2">
+                    <i class="fas fa-trash-alt"></i> Vyčistiť Aktuálny Chat
+                </button>
             </div>
-        </div>
+        </aside>
+
     </div>
 
-    <!-- REGISTRÁCIA / ZMENA PROFILU -->
-    <div id="auth-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center hidden z-50 p-4">
-        <div class="glass-panel max-w-md w-full p-6 rounded-2xl border border-cyan-500/40 space-y-4">
-            <h3 class="orbitron text-xl font-bold text-cyan-400 text-center">Profil Používateľa</h3>
-            
-            <div>
-                <label class="text-xs text-slate-400">Meno / Cyber Nick</label>
-                <input id="auth-username" type="text" placeholder="Napr. DankerMax" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-cyan-400 focus:outline-none mt-1">
-            </div>
-            <div>
-                <label class="text-xs text-slate-400">Email</label>
-                <input id="auth-email" type="email" placeholder="tvoj@email.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-cyan-400 focus:outline-none mt-1">
-            </div>
-            
-            <button onclick="handleUserAuth()" class="w-full orbitron bg-gradient-to-r from-cyan-500 to-purple-600 text-slate-950 font-bold py-2.5 rounded-xl uppercase tracking-wider text-xs transition">
-                Vstúpiť do siete
+    <!-- MODAL 1: Authentication (Login / Fast Register) -->
+    <div id="modal-auth" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel border border-yt-red/40 rounded-2xl w-full max-w-md p-6 relative shadow-neon-strong">
+            <button onclick="App.closeModals()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times text-lg"></i>
             </button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-yt-red flex items-center justify-center text-white text-2xl mx-auto mb-3 shadow-neon">
+                    <i class="fab fa-youtube"></i>
+                </div>
+                <h3 class="text-xl font-cyber font-bold text-white tracking-wider">PRIHLÁSENIE DO TUBECHAT</h3>
+                <p class="text-xs text-gray-400">Zadaj prezývku a zapoj sa do textových diskusií</p>
+            </div>
+
+            <form onsubmit="App.handleAuth(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Používateľské meno</label>
+                    <input type="text" id="auth-username" required placeholder="napr. CyberFan2025" 
+                           class="w-full bg-gray-900/80 border border-gray-700 focus:border-yt-red rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Rola</label>
+                    <select id="auth-role" class="w-full bg-gray-900/80 border border-gray-700 focus:border-yt-red rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
+                        <option value="fan">Fanúšik (Štandardný účet)</option>
+                        <option value="admin">Administrátor (Vyžaduje Secret Key)</option>
+                    </select>
+                </div>
+                <div id="auth-admin-secret-group" class="hidden">
+                    <label class="block text-xs font-semibold text-yellow-500 uppercase mb-1">Admin Secret Key</label>
+                    <input type="password" id="auth-secret" placeholder="Tajný kľúč správcu" 
+                           class="w-full bg-gray-900/80 border border-yellow-600/50 focus:border-yellow-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
+                </div>
+                <button type="submit" class="w-full py-3 rounded-xl bg-yt-red hover:bg-red-600 font-bold text-sm text-white shadow-neon transition uppercase">
+                    Vstúpiť do Siete
+                </button>
+            </form>
         </div>
     </div>
 
-    <!-- JAVASCRIPT: BLESKOVÁ LOGIKA, MQTT CLOUD, ADMIN SYNC -->
-    <script>
-        const SECRET_ADMIN_KEY = "AQ#Admin_9842!CoreX";
+    <!-- MODAL 2: YouTuber Verification Request Form -->
+    <div id="modal-verify" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel border border-yt-red/60 rounded-2xl w-full max-w-lg p-6 relative shadow-neon-strong max-h-[90vh] overflow-y-auto">
+            <button onclick="App.closeModals()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-yt-red flex items-center justify-center text-white text-xl">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-cyber font-bold text-white tracking-wide">AUTORIZÁCIA YOUTUBERA</h3>
+                    <p class="text-xs text-gray-400">Získaj oficiálnu červenú fajku a creator chatroom</p>
+                </div>
+            </div>
 
-        // MQTT CLOUD BROKER
-        const MQTT_BROKER = "broker.emqx.io";
-        const MQTT_PORT = 8084;
-        const MQTT_PATH = "/mqtt";
-        const CLIENT_ID = "FD_Node_" + Math.random().toString(16).substr(2, 8);
+            <div class="bg-red-950/30 border border-yt-red/30 p-3 rounded-xl mb-4 text-xs text-gray-300">
+                <i class="fas fa-info-circle text-yt-red mr-1"></i>
+                <strong>Dôležité:</strong> Nahraná overovacia selfie slúži <u>výhradne</u> pre administrátorov v privátnom kanáli a <strong>nikdy nebude zverejnená v chate</strong>.
+            </div>
 
-        // KANÁLY PRE GLOBÁLNU SYNCHRONIZÁCIU
-        const TOPIC_FEED = "facedanker/v4/global_feed";
-        const TOPIC_USERS = "facedanker/v4/users_registry";
-        const TOPIC_REQUESTS = "facedanker/v4/verify_requests";
-
-        let client;
-        let isSuperAdmin = sessionStorage.getItem('fd_is_admin') === 'true';
-
-        let selectedImageData = null;
-        let selectedAudioData = null;
-
-        // Globálny Stav
-        let currentUser = JSON.parse(localStorage.getItem('fd_user')) || null;
-        let posts = JSON.parse(localStorage.getItem('fd_posts')) || [];
-        let allUsers = JSON.parse(localStorage.getItem('fd_all_users')) || [];
-        let verifyRequests = JSON.parse(localStorage.getItem('fd_verify_reqs')) || [];
-        let bannedUsers = JSON.parse(localStorage.getItem('fd_banned')) || [];
-
-        // Automatické vytvorenie používateľa pri prvom vstupe
-        if (!currentUser) {
-            currentUser = {
-                name: "User_" + Math.floor(100 + Math.random() * 900),
-                email: "user" + Math.floor(1000 + Math.random() * 9000) + "@facedanker.sk",
-                verified: false,
-                birthplace: "Slovensko",
-                living: "Bratislava",
-                likes: "Fotografia, Hudba, Cyberpunk"
-            };
-            localStorage.setItem('fd_user', JSON.stringify(currentUser));
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            initMQTT();
-            updateUI();
-            registerUserGlobally();
-            runRecommendationAlgorithm();
-            renderPosts();
-        });
-
-        window.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.altKey && (e.key === 'a' || e.key === 'A')) {
-                openAdminAuthModal();
-            }
-        });
-
-        // ================= ULTRA RÝCHLA KOMPRESIA OBRÁZKA (BEZ ČAKANIA) ================= //
-        function handleImageSelection(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            document.getElementById('img-upload-status').innerText = "⚡ Pripravujem fotku...";
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    
-                    // Optimalizovaný rozmer pre bleskové zverejnenie
-                    const maxDim = 600;
-                    if (width > maxDim || height > maxDim) {
-                        if (width > height) {
-                            height = Math.round((height * maxDim) / width);
-                            width = maxDim;
-                        } else {
-                            width = Math.round((width * maxDim) / height);
-                            height = maxDim;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Skomprimuje na bleskových ~25-40 KB
-                    selectedImageData = canvas.toDataURL('image/jpeg', 0.62);
-
-                    document.getElementById('image-preview-elem').src = selectedImageData;
-                    document.getElementById('image-preview-box').classList.remove('hidden');
-                    document.getElementById('img-upload-status').innerText = "✓ Obrázok pripravený";
-                    document.getElementById('img-upload-status').className = "text-xs font-bold text-cyan-400";
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function clearSelectedImage() {
-            selectedImageData = null;
-            document.getElementById('post-img-file').value = "";
-            document.getElementById('image-preview-box').classList.add('hidden');
-            document.getElementById('image-preview-elem').src = "";
-            document.getElementById('img-upload-status').innerText = "Nahrať fotku zo zariadenia";
-            document.getElementById('img-upload-status').className = "text-xs font-bold text-slate-300";
-        }
-
-        function handleAudioSelection(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            if (file.size > 5 * 1024 * 1024) {
-                alert("Pre rýchlosť siete zvoľ audio do 5MB, alebo vlož MP3 URL!");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                selectedAudioData = e.target.result;
-                document.getElementById('audio-upload-status').innerText = "✓ MP3 pripravené";
-                document.getElementById('audio-upload-status').className = "text-xs font-bold text-purple-400";
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // ================= MQTT SPÁJANIE A PRÍJEM DÁT ================= //
-        function initMQTT() {
-            client = new Paho.MQTT.Client(MQTT_BROKER, Number(MQTT_PORT), MQTT_PATH, CLIENT_ID);
-            
-            client.onConnectionLost = () => {
-                const status = document.getElementById('mqtt-status');
-                status.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Offline`;
-                setTimeout(initMQTT, 3000);
-            };
-
-            client.onMessageArrived = (msg) => {
-                try {
-                    const data = JSON.parse(msg.payloadString);
-                    
-                    if (msg.destinationName === TOPIC_FEED && Array.isArray(data)) {
-                        posts = data;
-                        localStorage.setItem('fd_posts', JSON.stringify(posts));
-                        renderPosts();
-                    } else if (msg.destinationName === TOPIC_USERS && Array.isArray(data)) {
-                        allUsers = data;
-                        localStorage.setItem('fd_all_users', JSON.stringify(allUsers));
-                        runRecommendationAlgorithm();
-                        renderAdminHUD();
-                    } else if (msg.destinationName === TOPIC_REQUESTS && Array.isArray(data)) {
-                        verifyRequests = data;
-                        localStorage.setItem('fd_verify_reqs', JSON.stringify(verifyRequests));
-                        renderAdminHUD();
-                    }
-                } catch(e) {}
-            };
-
-            client.connect({
-                useSSL: true,
-                timeout: 5,
-                cleanSession: false,
-                onSuccess: () => {
-                    const status = document.getElementById('mqtt-status');
-                    status.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span> Globálne Spojené`;
-                    status.className = "flex items-center text-xs orbitron text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-full border border-emerald-400/30";
-                    
-                    client.subscribe(TOPIC_FEED);
-                    client.subscribe(TOPIC_USERS);
-                    client.subscribe(TOPIC_REQUESTS);
-
-                    registerUserGlobally();
-                },
-                onFailure: () => {
-                    const status = document.getElementById('mqtt-status');
-                    status.innerHTML = `<span class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></span> Lokálny Režim`;
-                }
-            });
-        }
-
-        function broadcastData(topic, payload) {
-            if (client && client.isConnected()) {
-                const msg = new Paho.MQTT.Message(JSON.stringify(payload));
-                msg.destinationName = topic;
-                msg.retained = true;
-                client.send(msg);
-            }
-        }
-
-        // ================= GLOBÁLNA REGISTRÁCIA POUŽÍVATEĽA ================= //
-        function registerUserGlobally() {
-            if (!currentUser) return;
-            const idx = allUsers.findIndex(u => u.email === currentUser.email);
-            if (idx === -1) {
-                allUsers.push(currentUser);
-            } else {
-                allUsers[idx] = currentUser;
-            }
-            localStorage.setItem('fd_all_users', JSON.stringify(allUsers));
-            broadcastData(TOPIC_USERS, allUsers);
-        }
-
-        // ================= OKAMŽITÉ ZVEREJNENIE PRÍSPEVKU ================= //
-        function publishPost() {
-            const titleInput = document.getElementById('post-title');
-            const audioUrlInput = document.getElementById('post-audio-url');
-            const title = titleInput.value.trim();
-            const audioUrl = audioUrlInput.value.trim();
-            const finalAudio = selectedAudioData || audioUrl;
-
-            if (!title && !selectedImageData && !finalAudio) {
-                alert("Vyber obrázok, hudbu alebo napíš popis!");
-                return;
-            }
-
-            const newPost = {
-                id: 'post_' + Date.now(),
-                author: currentUser.name,
-                authorEmail: currentUser.email,
-                verified: currentUser.verified,
-                title: title,
-                imgData: selectedImageData || null,
-                audioData: finalAudio || null,
-                likes: 0,
-                likedBy: [],
-                comments: [],
-                copyright: "FaceDanker Shield // " + currentUser.name,
-                timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            };
-
-            // 1. Okamžite pridaj do UI (0 milisekúnd)
-            posts.unshift(newPost);
-            localStorage.setItem('fd_posts', JSON.stringify(posts));
-            renderPosts();
-
-            // 2. Vyčisti formulár
-            titleInput.value = '';
-            audioUrlInput.value = '';
-            clearSelectedImage();
-            selectedAudioData = null;
-            document.getElementById('post-audio-file').value = "";
-            document.getElementById('audio-upload-status').innerText = "Nahrať MP3 zo zariadenia";
-            document.getElementById('audio-upload-status').className = "text-xs font-bold text-slate-300";
-
-            // 3. Pošli na EMQX v pozadí
-            broadcastData(TOPIC_FEED, posts.slice(0, 30));
-        }
-
-        function toggleLike(postId) {
-            const post = posts.find(p => p.id === postId);
-            if (post) {
-                const idx = post.likedBy.indexOf(currentUser.email);
-                if (idx > -1) {
-                    post.likedBy.splice(idx, 1);
-                    post.likes--;
-                } else {
-                    post.likedBy.push(currentUser.email);
-                    post.likes++;
-                }
-                localStorage.setItem('fd_posts', JSON.stringify(posts));
-                renderPosts();
-                broadcastData(TOPIC_FEED, posts.slice(0, 30));
-            }
-        }
-
-        function addComment(postId) {
-            const input = document.getElementById(`comment-input-${postId}`);
-            const text = input.value.trim();
-            if (!text) return;
-
-            const post = posts.find(p => p.id === postId);
-            if (post) {
-                post.comments.push({
-                    author: currentUser.name,
-                    verified: currentUser.verified,
-                    text: text
-                });
-                localStorage.setItem('fd_posts', JSON.stringify(posts));
-                input.value = '';
-                renderPosts();
-                broadcastData(TOPIC_FEED, posts.slice(0, 30));
-            }
-        }
-
-        function renderPosts() {
-            const container = document.getElementById('posts-container');
-            container.innerHTML = '';
-
-            if (posts.length === 0) {
-                container.innerHTML = `
-                    <div class="glass-panel p-8 text-center text-slate-400 rounded-2xl">
-                        <i class="fa-solid fa-satellite text-3xl text-cyan-400 mb-2"></i>
-                        <p class="font-bold text-white">Žiadne príspevky. Nahraj prvý obrázok!</p>
-                    </div>`;
-                return;
-            }
-
-            posts.forEach(post => {
-                if (bannedUsers.includes(post.authorEmail)) return;
-                const isLiked = post.likedBy && post.likedBy.includes(currentUser.email);
-
-                container.innerHTML += `
-                    <article class="glass-panel p-5 rounded-2xl space-y-4">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 rounded-full bg-slate-900 border border-cyan-500/40 flex items-center justify-center font-bold text-cyan-400 orbitron">
-                                    ${post.author ? post.author[0].toUpperCase() : 'U'}
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-white flex items-center gap-1.5 text-sm">
-                                        ${post.author}
-                                        ${post.verified ? '<i class="fa-solid fa-circle-check text-cyan-400 text-xs"></i>' : ''}
-                                    </h4>
-                                    <span class="text-[10px] text-slate-400">${post.timestamp || 'Práve teraz'} • <i class="fa-solid fa-copyright text-pink-500"></i> ${post.copyright}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        ${post.title ? `<p class="text-sm text-slate-200">${post.title}</p>` : ''}
-
-                        ${post.imgData ? `
-                            <div class="rounded-xl overflow-hidden border border-slate-800 max-h-[500px] bg-slate-950 flex items-center justify-center">
-                                <img src="${post.imgData}" alt="Obrázok" class="w-full object-contain max-h-[500px]">
-                            </div>
-                        ` : ''}
-
-                        ${post.audioData ? `
-                            <div class="bg-slate-900/90 p-3 rounded-xl border border-purple-500/30 flex flex-col gap-2">
-                                <div class="flex items-center gap-2 text-xs orbitron text-purple-400">
-                                    <i class="fa-solid fa-headphones animate-pulse"></i> FaceDanker Prehrávač
-                                </div>
-                                <audio controls class="w-full h-8">
-                                    <source src="${post.audioData}">
-                                </audio>
-                            </div>
-                        ` : ''}
-
-                        <div class="flex items-center space-x-4 pt-2 border-t border-slate-800 text-xs">
-                            <button onclick="toggleLike('${post.id}')" class="flex items-center gap-1.5 ${isLiked ? 'text-pink-500 font-bold' : 'text-slate-400 hover:text-pink-400'} transition">
-                                <i class="fa-heart ${isLiked ? 'fa-solid' : 'fa-regular'} text-base"></i>
-                                <span>${post.likes || 0} Lajkov</span>
-                            </button>
-                            <span class="text-slate-500">•</span>
-                            <span class="text-slate-400"><i class="fa-regular fa-comment mr-1"></i> ${(post.comments || []).length} Komentárov</span>
-                        </div>
-
-                        <div class="space-y-2 pt-2">
-                            ${(post.comments || []).map(c => `
-                                <div class="text-xs bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                                    <span class="font-bold text-cyan-400 mr-1">${c.author}${c.verified ? ' ✓' : ''}:</span>
-                                    <span class="text-slate-300">${c.text}</span>
-                                </div>
-                            `).join('')}
-
-                            <div class="flex gap-2 pt-1">
-                                <input id="comment-input-${post.id}" type="text" placeholder="Napíš komentár..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-cyan-400">
-                                <button onclick="addComment('${post.id}')" class="bg-cyan-500/20 border border-cyan-500/40 hover:bg-cyan-500/40 text-cyan-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">
-                                    <i class="fa-solid fa-paper-plane"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </article>
-                `;
-            });
-        }
-
-        // ================= ŽIADOSŤ O FAJKU (GLOBÁLNE K ADMINOVI) ================= //
-        function sendVerificationRequest() {
-            if (currentUser.verified) return alert("Tvoj účet už je overený!");
-
-            const existing = verifyRequests.some(r => r.email === currentUser.email);
-            if (existing) return alert("Tvoja žiadosť už u Admina čaká na schválenie.");
-
-            const req = {
-                name: currentUser.name,
-                email: currentUser.email,
-                birthplace: currentUser.birthplace || 'N/A',
-                living: currentUser.living || 'N/A',
-                time: new Date().toLocaleTimeString()
-            };
-
-            verifyRequests.push(req);
-            localStorage.setItem('fd_verify_reqs', JSON.stringify(verifyRequests));
-            
-            // Odošli cez MQTT na EMQX broker
-            broadcastData(TOPIC_REQUESTS, verifyRequests);
-            alert("✓ Žiadosť bola úspešne odoslaná Adminovi cez EMQX Cloud Broker!");
-        }
-
-        // ================= ODPORÚČACÍ ALGORITMUS ================= //
-        function runRecommendationAlgorithm() {
-            const list = document.getElementById('recommended-list');
-            list.innerHTML = '';
-
-            const currentUserLikes = (currentUser.likes || '').toLowerCase().split(',').map(s=>s.trim());
-
-            const recommendations = allUsers
-                .filter(u => u.email !== currentUser.email)
-                .map(user => {
-                    let score = 0;
-                    const uLikes = (user.likes || '').toLowerCase().split(',').map(s=>s.trim());
-                    currentUserLikes.forEach(l => {
-                        if (uLikes.some(ul => ul.includes(l) || l.includes(ul))) score += 40;
-                    });
-                    if (user.verified) score += 20;
-                    return { user, score };
-                })
-                .sort((a, b) => b.score - a.score)
-                .slice(0, 3);
-
-            if (recommendations.length === 0) {
-                list.innerHTML = `<p class="text-[11px] text-slate-500">Zatiaľ žiadne ďalšie profily.</p>`;
-                return;
-            }
-
-            recommendations.forEach(({user, score}) => {
-                list.innerHTML += `
-                    <div class="bg-slate-900/70 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center font-bold text-xs text-white">
-                                ${user.name[0].toUpperCase()}
-                            </div>
-                            <div>
-                                <h4 class="text-xs font-bold text-white flex items-center gap-1">
-                                    ${user.name}
-                                    ${user.verified ? '<i class="fa-solid fa-circle-check text-cyan-400 text-[10px]"></i>' : ''}
-                                </h4>
-                                <p class="text-[10px] text-slate-400 truncate max-w-[120px]">${user.living || 'Global'}</p>
-                            </div>
-                        </div>
-                        <span class="text-[10px] orbitron text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded">
-                            ${Math.min(99, 70 + score)}%
-                        </span>
+            <form onsubmit="App.handleVerificationSubmit(event)" class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Názov YouTube Kanála</label>
+                    <input type="text" id="verify-channel-name" required placeholder="napr. Duklock, Expl0ited, MenT..." 
+                           class="w-full bg-gray-900 border border-gray-700 focus:border-yt-red rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Presná URL Adresa Kanála</label>
+                    <input type="url" id="verify-channel-url" required placeholder="https://youtube.com/@tvojkanal" 
+                           class="w-full bg-gray-900 border border-gray-700 focus:border-yt-red rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Počet Odberateľov</label>
+                        <input type="number" id="verify-subs" required placeholder="napr. 150000" 
+                               class="w-full bg-gray-900 border border-gray-700 focus:border-yt-red rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none">
                     </div>
-                `;
-            });
-        }
-
-        // ================= SUPERADMIN HUD (AQ#Admin_9842!CoreX) ================= //
-        function openAdminAuthModal() {
-            document.getElementById('admin-auth-modal').classList.remove('hidden');
-        }
-        function closeAdminAuthModal() {
-            document.getElementById('admin-auth-modal').classList.add('hidden');
-            document.getElementById('admin-key-input').value = '';
-        }
-        function verifyAdminKey() {
-            if (document.getElementById('admin-key-input').value === SECRET_ADMIN_KEY) {
-                isSuperAdmin = true;
-                sessionStorage.setItem('fd_is_admin', 'true');
-                closeAdminAuthModal();
-                updateUI();
-                showSection('admin');
-                renderAdminHUD();
-            } else {
-                alert("Nesprávny prístupový kľúč!");
-            }
-        }
-        function logoutAdmin() {
-            isSuperAdmin = false;
-            sessionStorage.removeItem('fd_is_admin');
-            updateUI();
-            showSection('feed');
-        }
-
-        function renderAdminHUD() {
-            if (!isSuperAdmin) return;
-
-            // Odznak počtu žiadostí
-            const reqBadge = document.getElementById('admin-req-badge');
-            if (verifyRequests.length > 0) {
-                reqBadge.innerText = verifyRequests.length;
-                reqBadge.classList.remove('hidden');
-            } else {
-                reqBadge.classList.add('hidden');
-            }
-
-            document.getElementById('admin-verify-count').innerText = `${verifyRequests.length} Žiadostí`;
-            document.getElementById('admin-user-count').innerText = `${allUsers.length} Používateľov`;
-
-            // 1. Zoznam žiadostí o overenie
-            const verifyList = document.getElementById('admin-verify-list');
-            verifyList.innerHTML = verifyRequests.length === 0 ? `<p class="text-xs text-slate-500">Žiadne čakajúce žiadosti o fajku.</p>` : '';
-            verifyRequests.forEach((req, idx) => {
-                verifyList.innerHTML += `
-                    <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-cyan-500/40 text-xs">
-                        <div>
-                            <span class="font-bold text-white text-sm">${req.name}</span>
-                            <span class="text-slate-400 ml-2">(${req.email})</span>
-                            <div class="text-[10px] text-slate-500">Bydlisko: ${req.living} • Čas: ${req.time}</div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="adminApproveVerification('${req.email}', ${idx})" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg transition">
-                                Udeliť Fajku ✓
-                            </button>
-                            <button onclick="adminRejectVerification(${idx})" class="bg-slate-800 text-slate-400 px-3 py-1.5 rounded-lg hover:bg-slate-700">
-                                Zamietnuť
-                            </button>
-                        </div>
-                    </div>`;
-            });
-
-            // 2. Všetci používatelia (God Mode)
-            const usersTable = document.getElementById('admin-users-table');
-            usersTable.innerHTML = '';
-            allUsers.forEach((u) => {
-                const isBanned = bannedUsers.includes(u.email);
-                usersTable.innerHTML += `
-                    <div class="bg-slate-950 p-4 rounded-xl border ${isBanned ? 'border-red-600 bg-red-950/20' : 'border-slate-800'} text-xs space-y-2">
-                        <div class="flex justify-between items-center flex-wrap gap-2">
-                            <div>
-                                <span class="font-bold text-white text-sm">${u.name}</span>
-                                ${u.verified ? '<i class="fa-solid fa-circle-check text-cyan-400 ml-1"></i>' : ''}
-                                <span class="text-slate-400 ml-2">(${u.email})</span>
-                                ${isBanned ? '<span class="text-red-500 font-bold ml-2">[BANNED]</span>' : ''}
-                            </div>
-                            <div class="flex gap-1.5 flex-wrap">
-                                <button onclick="adminToggleUserBadge('${u.email}')" class="bg-cyan-600/30 border border-cyan-500 text-cyan-300 px-2.5 py-1 rounded-lg">
-                                    ${u.verified ? 'Odobrať Fajku' : 'Dať Fajku ✓'}
-                                </button>
-                                <button onclick="adminEditUser('${u.email}')" class="bg-purple-600/30 border border-purple-500 text-purple-300 px-2.5 py-1 rounded-lg">
-                                    Upraviť Profil
-                                </button>
-                                <button onclick="adminToggleBan('${u.email}')" class="${isBanned ? 'bg-green-600' : 'bg-red-600'} text-white font-bold px-2.5 py-1 rounded-lg">
-                                    ${isBanned ? 'UNBAN' : 'BAN'}
-                                </button>
-                                <button onclick="adminDeleteUser('${u.email}')" class="bg-red-900 border border-red-500 text-red-200 px-2.5 py-1 rounded-lg">
-                                    Vymazať
-                                </button>
-                            </div>
-                        </div>
-                        <div class="text-[11px] text-slate-400 grid grid-cols-1 md:grid-cols-3 gap-2 bg-slate-900/80 p-2 rounded-lg">
-                            <div><strong>Narodenie:</strong> ${u.birthplace || 'N/A'}</div>
-                            <div><strong>Bydlisko:</strong> ${u.living || 'N/A'}</div>
-                            <div><strong>Záujmy:</strong> ${u.likes || 'N/A'}</div>
-                        </div>
-                    </div>`;
-            });
-
-            // 3. Príspevky
-            const postsList = document.getElementById('admin-posts-list');
-            postsList.innerHTML = '';
-            posts.forEach(p => {
-                postsList.innerHTML += `
-                    <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs flex-wrap gap-2">
-                        <div>
-                            <strong class="text-pink-400">${p.author}</strong>: "${p.title || 'Médiá'}"
-                            <div class="text-[10px] text-slate-500">DMCA: ${p.copyright}</div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="adminEditDMCA('${p.id}')" class="bg-purple-600/30 text-purple-300 border border-purple-500 px-2 py-1 rounded-lg">Zmeniť DMCA</button>
-                            <button onclick="adminDeletePost('${p.id}')" class="bg-red-600/30 text-red-400 border border-red-500 px-2 py-1 rounded-lg">Zmazať</button>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        // ================= ADMIN AKCIE ================= //
-        function adminApproveVerification(email, idx) {
-            verifyRequests.splice(idx, 1);
-            localStorage.setItem('fd_verify_reqs', JSON.stringify(verifyRequests));
-            broadcastData(TOPIC_REQUESTS, verifyRequests);
-
-            const user = allUsers.find(u => u.email === email);
-            if (user) user.verified = true;
-            if (currentUser.email === email) currentUser.verified = true;
-            
-            posts.forEach(p => { if (p.authorEmail === email) p.verified = true; });
-
-            localStorage.setItem('fd_all_users', JSON.stringify(allUsers));
-            localStorage.setItem('fd_posts', JSON.stringify(posts));
-            localStorage.setItem('fd_user', JSON.stringify(currentUser));
-
-            broadcastData(TOPIC_USERS, allUsers);
-            broadcastData(TOPIC_FEED, posts.slice(0, 30));
-
-            updateUI();
-            renderPosts();
-            renderAdminHUD();
-            alert(`Používateľovi ${email} bola udelená Overená Fajka ✓`);
-        }
-
-        function adminRejectVerification(idx) {
-            verifyRequests.splice(idx, 1);
-            localStorage.setItem('fd_verify_reqs', JSON.stringify(verifyRequests));
-            broadcastData(TOPIC_REQUESTS, verifyRequests);
-            renderAdminHUD();
-        }
-
-        function adminToggleUserBadge(email) {
-            const user = allUsers.find(u => u.email === email);
-            if (user) {
-                user.verified = !user.verified;
-                if (currentUser.email === email) currentUser.verified = user.verified;
-                posts.forEach(p => { if (p.authorEmail === email) p.verified = user.verified; });
-
-                localStorage.setItem('fd_all_users', JSON.stringify(allUsers));
-                localStorage.setItem('fd_posts', JSON.stringify(posts));
-                localStorage.setItem('fd_user', JSON.stringify(currentUser));
-
-                broadcastData(TOPIC_USERS, allUsers);
-                broadcastData(TOPIC_FEED, posts.slice(0, 30));
-
-                updateUI();
-                renderPosts();
-                renderAdminHUD();
-            }
-        }
-
-        function adminEditUser(email) {
-            const u = allUsers.find(user => user.email === email);
-            if (!u) return;
-
-            u.name = prompt("Nové Meno:", u.name) || u.name;
-            u.birthplace = prompt("Miesto narodenia:", u.birthplace) || u.birthplace;
-            u.living = prompt("Aktuálne bydlisko:", u.living) || u.living;
-            u.likes = prompt("Záujmy:", u.likes) || u.likes;
-
-            if (currentUser.email === email) currentUser = u;
-
-            localStorage.setItem('fd_all_users', JSON.stringify(allUsers));
-            localStorage.setItem('fd_user', JSON.stringify(currentUser));
-            broadcastData(TOPIC_USERS, allUsers);
-
-            updateUI();
-            renderAdminHUD();
-            runRecommendationAlgorithm();
-        }
-
-        function adminDeleteUser(email) {
-            if (!confirm(`Nenávratne zmazať používateľa ${email}?`)) return;
-            allUsers = allUsers.filter(u => u.email !== email);
-            posts = posts.filter(p => p.authorEmail !== email);
-
-            localStorage.setItem('fd_all_users', JSON.stringify(allUsers));
-            localStorage.setItem('fd_posts', JSON.stringify(posts));
-
-            broadcastData(TOPIC_USERS, allUsers);
-            broadcastData(TOPIC_FEED, posts.slice(0, 30));
-
-            renderPosts();
-            renderAdminHUD();
-            runRecommendationAlgorithm();
-        }
-
-        function adminToggleBan(email) {
-            const idx = bannedUsers.indexOf(email);
-            if (idx > -1) {
-                bannedUsers.splice(idx, 1);
-            } else {
-                bannedUsers.push(email);
-            }
-            localStorage.setItem('fd_banned', JSON.stringify(bannedUsers));
-            renderPosts();
-            renderAdminHUD();
-        }
-
-        function adminEditDMCA(id) {
-            const p = posts.find(post => post.id === id);
-            if (!p) return;
-            const newDMCA = prompt("Nové autorské práva:", p.copyright);
-            if (newDMCA) {
-                p.copyright = newDMCA;
-                localStorage.setItem('fd_posts', JSON.stringify(posts));
-                renderPosts();
-                renderAdminHUD();
-                broadcastData(TOPIC_FEED, posts.slice(0, 30));
-            }
-        }
-
-        function adminDeletePost(id) {
-            posts = posts.filter(p => p.id !== id);
-            localStorage.setItem('fd_posts', JSON.stringify(posts));
-            renderPosts();
-            renderAdminHUD();
-            broadcastData(TOPIC_FEED, posts.slice(0, 30));
-        }
-
-        // ================= POMOCNÉ UI ================= //
-        function updateUI() {
-            const userCard = document.getElementById('user-quick-card');
-            const authActions = document.getElementById('auth-actions');
-            const adminNavBtn = document.getElementById('admin-nav-btn');
-
-            if (isSuperAdmin) adminNavBtn.classList.remove('hidden');
-
-            userCard.innerHTML = `
-                <div class="w-16 h-16 rounded-full mx-auto bg-gradient-to-tr from-cyan-400 via-purple-500 to-pink-500 p-0.5 mb-2 shadow-lg shadow-cyan-500/20">
-                    <div class="w-full h-full bg-slate-950 rounded-full flex items-center justify-center font-bold text-xl orbitron text-cyan-400">
-                        ${currentUser.name[0].toUpperCase()}
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Primárny Žáner / Bio</label>
+                        <input type="text" id="verify-bio" placeholder="Gaming, Vlogy, Veda..." 
+                               class="w-full bg-gray-900 border border-gray-700 focus:border-yt-red rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none">
                     </div>
                 </div>
-                <h4 class="font-bold text-white flex items-center justify-center gap-1.5">
-                    ${currentUser.name}
-                    ${currentUser.verified ? '<i class="fa-solid fa-circle-check text-cyan-400 text-sm"></i>' : ''}
-                </h4>
-                <p class="text-[11px] text-slate-400 mb-2">${currentUser.email}</p>
-                <div class="text-[11px] text-slate-300 space-y-1 bg-slate-900/80 p-2.5 rounded-xl text-left border border-slate-800">
-                    <div><strong class="text-cyan-400">Narodenie:</strong> ${currentUser.birthplace || 'Neuvedené'}</div>
-                    <div><strong class="text-cyan-400">Bydlisko:</strong> ${currentUser.living || 'Neuvedené'}</div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">
+                        Verifikačná Selfie (s papierom "TubeChat + Dátum")
+                    </label>
+                    <input type="file" id="verify-photo" accept="image/*" required onchange="App.handleImageCompression(event)"
+                           class="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-yt-red file:text-white hover:file:bg-red-600 cursor-pointer">
+                    <div id="verify-preview-container" class="mt-2 hidden">
+                        <p class="text-[11px] text-green-400 mb-1"><i class="fas fa-check-circle"></i> Fotografia bola automaticky optimalizovaná a pripravená na bezpečný prenos.</p>
+                        <img id="verify-preview" class="w-24 h-24 object-cover rounded-lg border border-yt-red">
+                    </div>
                 </div>
-            `;
 
-            authActions.innerHTML = `
-                <button onclick="document.getElementById('auth-modal').classList.remove('hidden')" class="orbitron text-xs bg-slate-900 hover:bg-cyan-500/20 text-cyan-300 border border-slate-700 px-3 py-1.5 rounded-xl transition">
-                    Zmeniť Profil
+                <button type="submit" id="btn-submit-verify" class="w-full py-2.5 rounded-xl bg-yt-red hover:bg-red-600 font-bold text-sm text-white shadow-neon transition uppercase">
+                    Odoslať Žiadosť Moderátorom
                 </button>
-            `;
+            </form>
+        </div>
+    </div>
 
-            document.getElementById('prof-name').innerText = currentUser.name;
-            document.getElementById('prof-email').innerText = currentUser.email;
-            document.getElementById('prof-birthplace').value = currentUser.birthplace || "";
-            document.getElementById('prof-living').value = currentUser.living || "";
-            document.getElementById('prof-likes').value = currentUser.likes || "";
-
-            if (currentUser.verified) {
-                document.getElementById('prof-badge').classList.remove('hidden');
-            } else {
-                document.getElementById('prof-badge').classList.add('hidden');
+    <!-- Application Script Engine -->
+    <script>
+        const CONFIG = {
+            BROKER_URL: "wss://broker.emqx.io:8084/mqtt",
+            SECRET_ADMIN_KEY: "admin123", // Kľúč pre aktiváciu Admin režimu
+            TOPICS: {
+                USERS: 'tubechat/v1/users_registry',
+                VERIFICATIONS: 'tubechat/v1/verifications_queue',
+                CHAT: 'tubechat/v1/chat_stream',
+                ADMIN: 'tubechat/v1/admin_events'
             }
-        }
+        };
 
-        function handleUserAuth() {
-            const name = document.getElementById('auth-username').value.trim();
-            const email = document.getElementById('auth-email').value.trim().toLowerCase();
-            if (!name || !email) return alert("Vyplň údaje!");
+        // Main State Store
+        const State = {
+            currentUser: null,
+            currentRoom: 'general',
+            mqttClient: null,
+            users: {},             // id -> user object
+            verifications: [],      // array of pending verifications
+            messages: [],          // array of recent chat messages
+            compressedImageBase64: null
+        };
 
-            currentUser.name = name;
-            currentUser.email = email;
-            localStorage.setItem('fd_user', JSON.stringify(currentUser));
-            
-            registerUserGlobally();
-            document.getElementById('auth-modal').classList.add('hidden');
-            updateUI();
-        }
+        // Application Controller
+        const App = {
+            init() {
+                this.loadSession();
+                this.initMQTT();
+                this.bindEvents();
+                this.updateUI();
+            },
 
-        function saveProfile() {
-            currentUser.birthplace = document.getElementById('prof-birthplace').value.trim();
-            currentUser.living = document.getElementById('prof-living').value.trim();
-            currentUser.likes = document.getElementById('prof-likes').value.trim();
-            
-            localStorage.setItem('fd_user', JSON.stringify(currentUser));
-            registerUserGlobally();
-            updateUI();
-            alert("Profil bol uložený a zosynchronizovaný s celou sieťou!");
-        }
+            loadSession() {
+                const cachedUser = localStorage.getItem('tubechat_user');
+                if (cachedUser) {
+                    try {
+                        State.currentUser = JSON.parse(cachedUser);
+                    } catch (e) {
+                        State.currentUser = null;
+                    }
+                }
+            },
 
-        function showSection(sec) {
-            document.getElementById('sec-feed').classList.add('hidden');
-            document.getElementById('sec-profile').classList.add('hidden');
-            document.getElementById('sec-admin').classList.add('hidden');
+            saveSession() {
+                if (State.currentUser) {
+                    localStorage.setItem('tubechat_user', JSON.stringify(State.currentUser));
+                } else {
+                    localStorage.removeItem('tubechat_user');
+                }
+            },
 
-            if (sec === 'feed') document.getElementById('sec-feed').classList.remove('hidden');
-            if (sec === 'profile') document.getElementById('sec-profile').classList.remove('hidden');
-            if (sec === 'admin') {
-                document.getElementById('sec-admin').classList.remove('hidden');
-                renderAdminHUD();
+            bindEvents() {
+                const input = document.getElementById('chat-input');
+                const counter = document.getElementById('char-counter');
+                input.addEventListener('input', () => {
+                    counter.innerText = 280 - input.value.length;
+                });
+
+                document.getElementById('auth-role').addEventListener('change', (e) => {
+                    const secretGroup = document.getElementById('auth-admin-secret-group');
+                    secretGroup.classList.toggle('hidden', e.target.value !== 'admin');
+                });
+            },
+
+            // --- MQTT REAL-TIME ENGINE ---
+            initMQTT() {
+                const clientId = "TubeChat_" + Math.random().toString(16).substr(2, 8);
+                const host = "broker.emqx.io";
+                const port = 8084;
+                const path = "/mqtt";
+
+                State.mqttClient = new Paho.MQTT.Client(host, port, path, clientId);
+
+                State.mqttClient.onConnectionLost = (responseObject) => {
+                    console.warn("MQTT Spojenie prerušené:", responseObject.errorMessage);
+                    this.updateConnectionStatus(false);
+                    setTimeout(() => App.initMQTT(), 3000);
+                };
+
+                State.mqttClient.onMessageArrived = (message) => {
+                    App.handleIncomingMessage(message.destinationName, message.payloadString);
+                };
+
+                const options = {
+                    useSSL: true,
+                    timeout: 5,
+                    onSuccess: () => {
+                        console.log("MQTT Pripojené k EMQX Brokeru.");
+                        this.updateConnectionStatus(true);
+                        
+                        // Subscribe to all database & stream topics
+                        State.mqttClient.subscribe(CONFIG.TOPICS.USERS, { qos: 1 });
+                        State.mqttClient.subscribe(CONFIG.TOPICS.VERIFICATIONS, { qos: 1 });
+                        State.mqttClient.subscribe(CONFIG.TOPICS.CHAT, { qos: 1 });
+                        State.mqttClient.subscribe(CONFIG.TOPICS.ADMIN, { qos: 1 });
+
+                        // Register active session in registry
+                        if (State.currentUser) {
+                            this.publishUserRegistry(State.currentUser);
+                        }
+                    },
+                    onFailure: (err) => {
+                        console.error("Zlyhanie pripojenia MQTT:", err);
+                        this.updateConnectionStatus(false);
+                        setTimeout(() => App.initMQTT(), 5000);
+                    }
+                };
+
+                try {
+                    State.mqttClient.connect(options);
+                } catch (e) {
+                    console.error("MQTT Exception:", e);
+                }
+            },
+
+            publish(topic, payload, retained = false) {
+                if (!State.mqttClient || !State.mqttClient.isConnected()) {
+                    console.warn("MQTT nie je pripojené.");
+                    return;
+                }
+                const message = new Paho.MQTT.Message(JSON.stringify(payload));
+                message.destinationName = topic;
+                message.retained = retained;
+                message.qos = 1;
+                State.mqttClient.send(message);
+            },
+
+            handleIncomingMessage(topic, payloadString) {
+                try {
+                    const data = JSON.parse(payloadString);
+
+                    switch (topic) {
+                        case CONFIG.TOPICS.USERS:
+                            this.syncUsersRegistry(data);
+                            break;
+
+                        case CONFIG.TOPICS.VERIFICATIONS:
+                            this.syncVerificationsQueue(data);
+                            break;
+
+                        case CONFIG.TOPICS.CHAT:
+                            this.receiveChatMessage(data);
+                            break;
+
+                        case CONFIG.TOPICS.ADMIN:
+                            this.handleAdminEvent(data);
+                            break;
+                    }
+                } catch (e) {
+                    console.error("Chyba spracovania MQTT správy:", e);
+                }
+            },
+
+            // --- USER REGISTRY DATABASE ---
+            syncUsersRegistry(incomingUsers) {
+                if (Array.isArray(incomingUsers)) {
+                    incomingUsers.forEach(u => {
+                        State.users[u.id] = u;
+                    });
+                } else if (incomingUsers && incomingUsers.id) {
+                    State.users[incomingUsers.id] = incomingUsers;
+                }
+
+                // If our current user got updated remotely (e.g. role upgraded by admin)
+                if (State.currentUser && State.users[State.currentUser.id]) {
+                    const updated = State.users[State.currentUser.id];
+                    if (updated.isBanned && !State.currentUser.isBanned) {
+                        alert("Váš účet bol zablokovaný administrátorom.");
+                        this.logout();
+                        return;
+                    }
+                    State.currentUser = updated;
+                    this.saveSession();
+                }
+
+                this.renderCreatorsList();
+                this.renderAdminUsers();
+                this.updateUI();
+            },
+
+            publishUserRegistry(user) {
+                State.users[user.id] = user;
+                // Retain all users array
+                const usersArray = Object.values(State.users);
+                this.publish(CONFIG.TOPICS.USERS, usersArray, true);
+            },
+
+            // --- VERIFICATION QUEUE & PHOTO HANDLING ---
+            syncVerificationsQueue(queue) {
+                State.verifications = Array.isArray(queue) ? queue : [];
+                this.renderAdminVerifications();
+            },
+
+            handleImageCompression(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 300;
+                        const scale = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scale;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                        // High compression JPEG Base64
+                        State.compressedImageBase64 = canvas.toDataURL('image/jpeg', 0.6);
+
+                        const preview = document.getElementById('verify-preview');
+                        preview.src = State.compressedImageBase64;
+                        document.getElementById('verify-preview-container').classList.remove('hidden');
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            },
+
+            handleVerificationSubmit(e) {
+                e.preventDefault();
+                if (!State.currentUser) {
+                    alert("Pred odoslaním žiadosti sa musíte prihlásiť.");
+                    return;
+                }
+
+                if (!State.compressedImageBase64) {
+                    alert("Prosím nahrajte verifikačnú selfie fotku.");
+                    return;
+                }
+
+                const request = {
+                    userId: State.currentUser.id,
+                    username: State.currentUser.username,
+                    channelName: document.getElementById('verify-channel-name').value.trim(),
+                    channelUrl: document.getElementById('verify-channel-url').value.trim(),
+                    subscribers: parseInt(document.getElementById('verify-subs').value, 10) || 0,
+                    bio: document.getElementById('verify-bio').value.trim(),
+                    selfieBase64: State.compressedImageBase64,
+                    createdAt: new Date().toISOString()
+                };
+
+                // Add to list and publish with retained=true
+                const filtered = State.verifications.filter(v => v.userId !== State.currentUser.id);
+                filtered.push(request);
+                this.publish(CONFIG.TOPICS.VERIFICATIONS, filtered, true);
+
+                alert("Vaša žiadosť bola bezpečne odoslaná administrátorom na preverenie.");
+                this.closeModals();
+            },
+
+            // --- CHAT SYSTEM (TEXT & EMOJI ONLY) ---
+            sendMessage(e) {
+                e.preventDefault();
+                if (!State.currentUser) {
+                    this.showAuthModal();
+                    return;
+                }
+
+                if (State.currentUser.isBanned) {
+                    alert("Váš účet má ban.");
+                    return;
+                }
+
+                if (State.currentRoom === 'creators-only' && State.currentUser.role !== 'youtuber' && State.currentUser.role !== 'admin') {
+                    alert("Do tejto miestnosti môžu písať výhradne overení YouTuberi a Admini!");
+                    return;
+                }
+
+                const input = document.getElementById('chat-input');
+                let text = input.value.trim();
+                if (!text) return;
+
+                // STRICT CHECK: Reject if user tries to paste inline base64 image or markdown image
+                if (text.includes('data:image/') || text.match(/!\[.*?\]\(.*?\)/i)) {
+                    alert("Zverejňovanie obrázkov v chate je prísne zakázané!");
+                    return;
+                }
+
+                const msgObj = {
+                    id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                    roomId: State.currentRoom,
+                    senderId: State.currentUser.id,
+                    senderName: State.currentUser.username,
+                    senderRole: State.currentUser.role,
+                    isVerified: State.currentUser.isVerified || false,
+                    text: text,
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                };
+
+                this.publish(CONFIG.TOPICS.CHAT, msgObj, false);
+                input.value = '';
+                document.getElementById('char-counter').innerText = '280';
+            },
+
+            receiveChatMessage(msg) {
+                if (msg.roomId !== State.currentRoom) return;
+
+                State.messages.push(msg);
+                if (State.messages.length > 100) State.messages.shift();
+
+                const container = document.getElementById('chat-messages');
+                const isMe = State.currentUser && State.currentUser.id === msg.senderId;
+
+                const msgEl = document.createElement('div');
+                msgEl.id = `chat-${msg.id}`;
+                msgEl.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} transition-all`;
+
+                let badgeHtml = '';
+                if (msg.senderRole === 'youtuber' || msg.isVerified) {
+                    badgeHtml = `<span class="inline-flex items-center gap-1 text-[10px] bg-red-950/80 text-yt-red border border-yt-red px-1.5 py-0.2 rounded font-bold ml-1 shadow-sm"><i class="fab fa-youtube"></i> CREATOR</span>`;
+                } else if (msg.senderRole === 'admin') {
+                    badgeHtml = `<span class="inline-flex items-center gap-1 text-[10px] bg-yellow-950/80 text-yellow-400 border border-yellow-500 px-1.5 py-0.2 rounded font-bold ml-1"><i class="fas fa-shield-alt"></i> ADMIN</span>`;
+                }
+
+                const bubbleStyle = isMe 
+                    ? 'bg-gradient-to-r from-red-950/70 to-neutral-900 border border-yt-red/40 text-white rounded-tr-none'
+                    : msg.senderRole === 'youtuber'
+                        ? 'bg-neutral-900/90 border border-yt-red/60 text-gray-100 rounded-tl-none shadow-neon'
+                        : 'bg-gray-900/80 border border-gray-800 text-gray-200 rounded-tl-none';
+
+                msgEl.innerHTML = `
+                    <div class="flex items-center space-x-1 mb-1 text-xs">
+                        <span class="font-bold ${msg.senderRole === 'youtuber' ? 'text-yt-red' : 'text-gray-400'}">${this.escapeHTML(msg.senderName)}</span>
+                        ${badgeHtml}
+                        <span class="text-[10px] text-gray-600 ml-2">${msg.timestamp}</span>
+                        ${State.currentUser && State.currentUser.role === 'admin' ? `
+                            <button onclick="App.adminDeleteMessage('${msg.id}')" title="Vymazať správu" class="text-gray-600 hover:text-yt-red ml-1.5 text-[10px]">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                    <div class="max-w-md px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${bubbleStyle} break-words shadow-sm">
+                        ${this.escapeHTML(msg.text)}
+                    </div>
+                `;
+
+                container.appendChild(msgEl);
+                container.scrollTop = container.scrollHeight;
+            },
+
+            switchRoom(roomId) {
+                State.currentRoom = roomId;
+                document.querySelectorAll('.room-btn').forEach(b => {
+                    const active = b.dataset.room === roomId;
+                    b.className = active 
+                        ? 'room-btn w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between transition bg-yt-red/20 text-white border border-yt-red/40 font-medium'
+                        : 'room-btn w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between transition text-gray-400 hover:text-white hover:bg-gray-900/40';
+                });
+
+                document.getElementById('current-room-title').innerText = roomId;
+                document.getElementById('chat-messages').innerHTML = `
+                    <div class="text-center my-6">
+                        <div class="inline-block px-4 py-1.5 rounded-full bg-gray-900/60 border border-gray-800 text-xs text-gray-400">
+                            Prepnúté do miestnosti #${roomId}
+                        </div>
+                    </div>
+                `;
+            },
+
+            // --- ADMIN ACTIONS & GOD MODE ---
+            handleAdminEvent(event) {
+                if (event.action === 'clear_chat') {
+                    document.getElementById('chat-messages').innerHTML = `
+                        <div class="text-center my-6">
+                            <div class="inline-block px-4 py-1.5 rounded-full bg-red-950/40 border border-yt-red text-xs text-yt-red">
+                                <i class="fas fa-exclamation-triangle mr-1"></i> Chat bol vyčistený moderátorom.
+                            </div>
+                        </div>
+                    `;
+                } else if (event.action === 'delete_message') {
+                    const el = document.getElementById(`chat-${event.messageId}`);
+                    if (el) el.remove();
+                } else if (event.action === 'broadcast_alert') {
+                    alert(`🚨 GLOBÁLNE HLÁSENIE OD ADMINA:\n\n${event.text}`);
+                }
+            },
+
+            adminApproveYouTuber(userId) {
+                const req = State.verifications.find(v => v.userId === userId);
+                if (!req) return;
+
+                // Update User Role to YouTuber
+                if (State.users[userId]) {
+                    State.users[userId].role = 'youtuber';
+                    State.users[userId].isVerified = true;
+                    State.users[userId].channelUrl = req.channelUrl;
+                    State.users[userId].bio = req.bio;
+                    State.users[userId].subscribers = req.subscribers;
+                }
+
+                // Remove from verification queue
+                State.verifications = State.verifications.filter(v => v.userId !== userId);
+
+                // Publish updates retained
+                this.publish(CONFIG.TOPICS.USERS, Object.values(State.users), true);
+                this.publish(CONFIG.TOPICS.VERIFICATIONS, State.verifications, true);
+
+                alert(`Používateľ ${req.username} bol overený ako oficiálny YOUTUBER!`);
+            },
+
+            adminRejectYouTuber(userId) {
+                State.verifications = State.verifications.filter(v => v.userId !== userId);
+                this.publish(CONFIG.TOPICS.VERIFICATIONS, State.verifications, true);
+                alert("Žiadosť bola zamietnutá.");
+            },
+
+            adminToggleBan(userId) {
+                if (!State.users[userId]) return;
+                State.users[userId].isBanned = !State.users[userId].isBanned;
+                this.publish(CONFIG.TOPICS.USERS, Object.values(State.users), true);
+            },
+
+            adminDeleteUser(userId) {
+                if (confirm("Naozaj zmazať tohto používateľa z databázy?")) {
+                    delete State.users[userId];
+                    this.publish(CONFIG.TOPICS.USERS, Object.values(State.users), true);
+                }
+            },
+
+            adminClearChat() {
+                if (confirm("Naozaj vyčistiť celý stream chatu pre všetkých?")) {
+                    this.publish(CONFIG.TOPICS.ADMIN, { action: 'clear_chat' }, false);
+                }
+            },
+
+            adminDeleteMessage(msgId) {
+                this.publish(CONFIG.TOPICS.ADMIN, { action: 'delete_message', messageId: msgId }, false);
+            },
+
+            adminBroadcastAlert() {
+                const text = prompt("Zadaj správu globálneho hlásenia pre všetkých online používateľov:");
+                if (text && text.trim()) {
+                    this.publish(CONFIG.TOPICS.ADMIN, { action: 'broadcast_alert', text: text.trim() }, false);
+                }
+            },
+
+            // --- UI RENDERING HELPERS ---
+            updateConnectionStatus(connected) {
+                const el = document.getElementById('mqtt-status');
+                if (connected) {
+                    el.className = "flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-950/40 border border-emerald-600/50 text-emerald-400 text-xs font-medium";
+                    el.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span class="status-text hidden md:inline">EMQX Online</span>';
+                } else {
+                    el.className = "flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-red-950/40 border border-yt-red/50 text-yt-red text-xs font-medium";
+                    el.innerHTML = '<span class="w-2 h-2 rounded-full bg-yt-red animate-ping"></span><span class="status-text hidden md:inline">Offline</span>';
+                }
+            },
+
+            updateUI() {
+                const userPill = document.getElementById('user-pill');
+                const btnAuth = document.getElementById('btn-open-auth');
+                const btnVerify = document.getElementById('btn-request-verify');
+                const btnAdmin = document.getElementById('btn-admin-toggle');
+
+                if (State.currentUser) {
+                    userPill.classList.remove('hidden');
+                    userPill.classList.add('flex');
+                    btnAuth.classList.add('hidden');
+
+                    document.getElementById('user-display-name').innerText = State.currentUser.username;
+                    document.getElementById('user-initials').innerText = State.currentUser.username.substring(0, 2).toUpperCase();
+
+                    const badgeSpan = document.getElementById('user-role-badge');
+                    const roleSpan = document.getElementById('user-display-role');
+
+                    if (State.currentUser.role === 'youtuber' || State.currentUser.isVerified) {
+                        badgeSpan.innerHTML = '<i class="fab fa-youtube text-yt-red ml-1"></i>';
+                        roleSpan.innerText = 'Overený YouTuber';
+                        roleSpan.className = 'text-[10px] text-yt-red font-bold';
+                        btnVerify.classList.add('hidden');
+                    } else if (State.currentUser.role === 'admin') {
+                        badgeSpan.innerHTML = '<i class="fas fa-shield-alt text-yellow-500 ml-1"></i>';
+                        roleSpan.innerText = 'God-Mode Admin';
+                        roleSpan.className = 'text-[10px] text-yellow-500 font-bold';
+                        btnVerify.classList.add('hidden');
+                    } else {
+                        badgeSpan.innerHTML = '';
+                        roleSpan.innerText = 'Fanúšik';
+                        roleSpan.className = 'text-[10px] text-gray-400';
+                        btnVerify.classList.remove('hidden');
+                    }
+
+                    // Admin button visibility
+                    btnAdmin.classList.toggle('hidden', State.currentUser.role !== 'admin');
+                } else {
+                    userPill.classList.add('hidden');
+                    userPill.classList.remove('flex');
+                    btnAuth.classList.remove('hidden');
+                    btnVerify.classList.add('hidden');
+                    btnAdmin.classList.add('hidden');
+                }
+            },
+
+            renderCreatorsList() {
+                const list = document.getElementById('verified-creators-list');
+                const countBadge = document.getElementById('creators-count');
+                const creators = Object.values(State.users).filter(u => u.role === 'youtuber' || u.isVerified);
+
+                countBadge.innerText = creators.length;
+
+                if (creators.length === 0) {
+                    list.innerHTML = `<div class="text-xs text-gray-500 italic p-2 text-center">Zatiaľ žiadni schválení YouTuberi</div>`;
+                    return;
+                }
+
+                list.innerHTML = creators.map(c => `
+                    <div class="flex items-center justify-between p-2 rounded-xl bg-gray-950/60 border border-yt-red/20 hover:border-yt-red/50 transition">
+                        <div class="flex items-center space-x-2.5 overflow-hidden">
+                            <div class="w-8 h-8 rounded-lg bg-red-950/90 border border-yt-red/40 flex items-center justify-center text-yt-red font-bold text-xs flex-shrink-0">
+                                <i class="fab fa-youtube"></i>
+                            </div>
+                            <div class="overflow-hidden">
+                                <div class="text-xs font-bold text-white truncate flex items-center gap-1">
+                                    ${this.escapeHTML(c.username)}
+                                </div>
+                                <div class="text-[10px] text-gray-400 truncate">${c.subscribers ? c.subscribers.toLocaleString() + ' subs' : 'Creator'}</div>
+                            </div>
+                        </div>
+                        ${c.channelUrl ? `
+                            <a href="${c.channelUrl}" target="_blank" title="Otvoriť YouTube kanál" class="text-gray-500 hover:text-yt-red text-xs px-2">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        ` : ''}
+                    </div>
+                `).join('');
+            },
+
+            renderAdminVerifications() {
+                const list = document.getElementById('admin-verification-list');
+                const badge = document.getElementById('pending-badge');
+                const count = document.getElementById('admin-requests-count');
+
+                count.innerText = State.verifications.length;
+                badge.innerText = State.verifications.length;
+                badge.classList.toggle('hidden', State.verifications.length === 0);
+
+                if (State.verifications.length === 0) {
+                    list.innerHTML = `<div class="text-xs text-gray-400 italic text-center p-4 border border-gray-900 rounded-xl bg-black/40">Žiadne čakajúce verifikácie.</div>`;
+                    return;
+                }
+
+                list.innerHTML = State.verifications.map(req => `
+                    <div class="p-3 rounded-xl bg-black/80 border border-yt-red/30 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-white">${this.escapeHTML(req.username)}</span>
+                            <span class="text-[10px] text-yt-red font-semibold">${req.subscribers.toLocaleString()} subs</span>
+                        </div>
+                        <div class="text-[11px] text-gray-400">
+                            <strong>Kanál:</strong> <a href="${req.channelUrl}" target="_blank" class="text-blue-400 underline">${this.escapeHTML(req.channelName)}</a>
+                        </div>
+                        <!-- Verified Selfie Photo for Admin Eyes Only -->
+                        <div class="mt-2">
+                            <p class="text-[10px] text-gray-400 mb-1 font-semibold"><i class="fas fa-camera text-yt-red mr-1"></i>Privátna Verifikačná Selfie:</p>
+                            <img src="${req.selfieBase64}" class="w-full h-36 object-cover rounded-lg border border-gray-800">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 pt-2">
+                            <button onclick="App.adminApproveYouTuber('${req.userId}')" class="py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition">
+                                <i class="fas fa-check mr-1"></i> Schváliť
+                            </button>
+                            <button onclick="App.adminRejectYouTuber('${req.userId}')" class="py-1.5 rounded-lg bg-neutral-800 hover:bg-red-950 text-gray-300 hover:text-yt-red font-bold text-xs transition border border-gray-700">
+                                <i class="fas fa-times mr-1"></i> Odmietnuť
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            renderAdminUsers() {
+                const list = document.getElementById('admin-users-list');
+                const users = Object.values(State.users);
+                document.getElementById('admin-users-count').innerText = users.length;
+
+                list.innerHTML = users.map(u => `
+                    <div class="flex items-center justify-between p-2 rounded-lg bg-black/40 border border-gray-900 text-xs">
+                        <div>
+                            <div class="font-bold text-white flex items-center gap-1">
+                                ${this.escapeHTML(u.username)}
+                                <span class="text-[9px] px-1.5 py-0.2 rounded ${u.role === 'youtuber' ? 'bg-yt-red text-white' : u.role === 'admin' ? 'bg-yellow-500 text-black' : 'bg-gray-800 text-gray-400'}">${u.role}</span>
+                                ${u.isBanned ? '<span class="text-[9px] bg-red-600 text-white px-1 rounded">BANNED</span>' : ''}
+                            </div>
+                            <div class="text-[10px] text-gray-500">ID: ${u.id.substr(0, 10)}...</div>
+                        </div>
+                        <div class="flex items-center space-x-1.5">
+                            <button onclick="App.adminToggleBan('${u.id}')" title="${u.isBanned ? 'Odbanovať' : 'Zabanovať'}" class="p-1 text-gray-400 hover:text-yellow-500">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                            <button onclick="App.adminDeleteUser('${u.id}')" title="Zmazať účet" class="p-1 text-gray-400 hover:text-yt-red">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            // --- AUTH & MODALS ---
+            showAuthModal() { document.getElementById('modal-auth').classList.remove('hidden'); },
+            showVerificationModal() { document.getElementById('modal-verify').classList.remove('hidden'); },
+            closeModals() {
+                document.getElementById('modal-auth').classList.add('hidden');
+                document.getElementById('modal-verify').classList.add('hidden');
+            },
+            toggleAdminPanel() {
+                document.getElementById('admin-panel').classList.toggle('hidden');
+            },
+
+            handleAuth(e) {
+                e.preventDefault();
+                const username = document.getElementById('auth-username').value.trim();
+                const role = document.getElementById('auth-role').value;
+                const secret = document.getElementById('auth-secret').value;
+
+                if (role === 'admin' && secret !== CONFIG.SECRET_ADMIN_KEY) {
+                    alert("Nesprávny Secret Key pre rolu Admin!");
+                    return;
+                }
+
+                const user = {
+                    id: 'usr_' + Math.random().toString(36).substr(2, 9),
+                    username: username,
+                    role: role,
+                    isVerified: role === 'youtuber',
+                    isBanned: false,
+                    joinedAt: new Date().toISOString()
+                };
+
+                State.currentUser = user;
+                this.saveSession();
+                this.publishUserRegistry(user);
+                this.closeModals();
+                this.updateUI();
+            },
+
+            logout() {
+                State.currentUser = null;
+                this.saveSession();
+                this.updateUI();
+            },
+
+            escapeHTML(str) {
+                if (!str) return '';
+                return str.replace(/[&<>'"]/g, 
+                    tag => ({
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        "'": '&#39;',
+                        '"': '&quot;'
+                    }[tag] || tag)
+                );
             }
-        }
+        };
+
+        // Bootstrap on DOM ready
+        window.addEventListener('DOMContentLoaded', () => {
+            App.init();
+        });
     </script>
 </body>
 </html>
