@@ -1,583 +1,733 @@
 <!DOCTYPE html>
-<html lang="sk" class="dark">
+<html lang="sk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQ CREATOR AI - Global Realtime Music Core</title>
-    <!-- Tailwind CSS -->
+    <title>FaceDanker // Next-Gen Media Network</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- MQTT.js Cloud Databáza -->
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        cyber: {
-                            bg: '#05070f',
-                            neon: '#00f2fe',
-                            magenta: '#ff007f',
-                            purple: '#7928ca'
-                        }
-                    },
-                    animation: {
-                        'pulse-glow': 'pulseGlow 2s infinite',
-                    },
-                    keyframes: {
-                        pulseGlow: {
-                            '0%, 100%': { boxShadow: '0 0 15px rgba(0, 242, 254, 0.4), inset 0 0 15px rgba(255, 0, 127, 0.2)' },
-                            '50%': { boxShadow: '0 0 30px rgba(0, 242, 254, 0.8), inset 0 0 20px rgba(255, 0, 127, 0.5)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- FontAwesome Ikony -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Paho MQTT cez WebSockets -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+
     <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff0055;
+            --neon-purple: #8000ff;
+            --bg-dark: #070913;
+        }
         body {
-            background-color: #05070f;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(121, 40, 202, 0.2) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(0, 242, 254, 0.2) 0px, transparent 50%);
+            background-color: var(--bg-dark);
+            font-family: 'Rajdhani', sans-serif;
             color: #e2e8f0;
-            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
-            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(128, 0, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(0, 243, 255, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
         }
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+        
         .glass-panel {
-            background: rgba(13, 18, 36, 0.85);
+            background: rgba(15, 23, 42, 0.65);
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 242, 254, 0.25);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
-        .glow-text { text-shadow: 0 0 12px rgba(0, 242, 254, 0.6); }
-        
-        /* Audio Player Styling */
-        audio::-webkit-media-controls-panel {
-            background-color: #0d1224;
+        .glass-panel:hover {
+            border-color: rgba(0, 243, 255, 0.35);
         }
-        audio::-webkit-media-controls-current-time-display,
-        audio::-webkit-media-controls-time-remaining-display {
-            color: #00f2fe;
-            font-family: monospace;
+        .neon-border-pink {
+            border-color: rgba(255, 0, 85, 0.4);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.2);
         }
-        
-        /* Equalizer Bars Animation */
-        .eq-bar {
-            width: 3px;
-            background: #00f2fe;
-            border-radius: 2px;
-            animation: bounce 0.8s ease infinite alternate;
+        .neon-glow-blue {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
         }
-        @keyframes bounce {
-            0% { height: 4px; }
-            100% { height: 20px; }
-        }
-        .eq-bar:nth-child(2) { animation-delay: 0.2s; background: #ff007f; }
-        .eq-bar:nth-child(3) { animation-delay: 0.4s; background: #00f2fe; }
-        .eq-bar:nth-child(4) { animation-delay: 0.1s; background: #7928ca; }
-        .eq-bar:nth-child(5) { animation-delay: 0.3s; background: #00f2fe; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #070913; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-blue); }
     </style>
 </head>
-<body class="p-4 md:p-8 relative selection:bg-cyan-500 selection:text-black">
+<body class="min-h-screen flex flex-col">
 
-    <!-- Horná Navigácia -->
-    <header class="max-w-7xl mx-auto flex flex-wrap justify-between items-center pb-6 border-b border-cyan-500/20 mb-8 gap-4">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(0,242,254,0.6)] animate-pulse">
-                <i data-lucide="disc-3" class="text-white w-6 h-6 animate-spin" style="animation-duration: 6s;"></i>
+    <!-- Horná Navigačná Lišta -->
+    <header class="glass-panel sticky top-0 z-50 px-4 lg:px-8 py-3 flex justify-between items-center border-b border-cyan-500/20">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('feed')">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-cyan-500 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                <i class="fa-solid fa-cube text-white text-xl animate-pulse"></i>
             </div>
-            <div>
-                <h1 class="text-2xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-pink-500 to-purple-400 glow-text">AQ CREATOR</h1>
-                <p class="text-xs text-cyan-400/70 font-mono tracking-widest uppercase">Hybrid Human-AI Audio Core</p>
-            </div>
+            <span class="orbitron text-2xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-pink-500">FaceDanker</span>
         </div>
 
-        <div class="flex items-center flex-wrap gap-3">
-            <!-- Indikátor cloudu -->
-            <div id="connStatus" class="px-3 py-1.5 rounded-xl bg-yellow-950/40 border border-yellow-500/40 text-yellow-400 text-xs font-mono flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-yellow-400 animate-ping"></span>
-                <span>Pripájanie...</span>
+        <!-- MQTT Status & User Info -->
+        <div class="flex items-center space-x-4">
+            <div id="mqtt-status" class="flex items-center text-xs orbitron text-yellow-400 bg-yellow-400/10 px-3 py-1 rounded-full border border-yellow-400/30">
+                <span class="w-2 h-2 rounded-full bg-yellow-400 mr-2 animate-ping"></span> EMQX Spájanie...
             </div>
 
-            <!-- Denný limit -->
-            <div class="glass-panel px-4 py-2 rounded-xl flex items-center space-x-2 border border-pink-500/30">
-                <i data-lucide="zap" class="text-pink-500 w-4 h-4"></i>
-                <span class="text-xs text-gray-400 font-mono">Kredity dnes:</span>
-                <span id="creditsCount" class="font-bold text-pink-400 font-mono">4/4</span>
+            <div id="auth-actions" class="flex items-center space-x-2">
+                <!-- Dynamicky generované tlačidlá -->
             </div>
-
-            <!-- Tlačidlo Admin Panel -->
-            <button onclick="handleAdminAuth()" id="modeToggleBtn" class="px-4 py-2 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500 hover:text-black transition-all duration-300 font-mono text-sm flex items-center space-x-2">
-                <i data-lucide="shield-check" class="w-4 h-4"></i>
-                <span id="modeText">Admin Core</span>
-            </button>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto">
-        <!-- ================= USER VIEW ================= -->
-        <div id="userView" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Formulár generátora -->
-            <div class="lg:col-span-5 space-y-6">
-                <div class="glass-panel p-6 rounded-2xl relative overflow-hidden shadow-2xl animate-pulse-glow">
-                    <div class="flex items-center space-x-2 mb-4 text-cyan-400">
-                        <i data-lucide="sparkles" class="w-5 h-5"></i>
-                        <h2 class="text-lg font-bold tracking-wide">Studio Prompt Engine</h2>
-                    </div>
+    <!-- Hlavné Telo -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-                    <form id="musicForm" onsubmit="handleGenerate(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-mono uppercase text-gray-400 mb-1">Názov Skladby</label>
-                            <input type="text" id="songTitle" required placeholder="napr. Cyber Neon Dreams" 
-                                class="w-full bg-black/50 border border-cyan-500/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400 text-white placeholder-gray-600 transition">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-mono uppercase text-gray-400 mb-1">Štýl & Kľúčové Slová</label>
-                            <input type="text" id="songStyle" required placeholder="Synthwave, 128 BPM, Cyberpunk, Solo..." 
-                                class="w-full bg-black/50 border border-cyan-500/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400 text-white placeholder-gray-600 transition">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-mono uppercase text-gray-400 mb-1">Text / Inštrukcie pre skladbu</label>
-                            <textarea id="songLyrics" rows="5" required placeholder="[Verse 1]&#10;Neon lights in the rain...&#10;[Chorus]&#10;AQ Creator takes control..." 
-                                class="w-full bg-black/50 border border-cyan-500/30 rounded-xl p-4 text-sm focus:outline-none focus:border-cyan-400 text-white placeholder-gray-600 font-mono transition"></textarea>
-                        </div>
-
-                        <button type="submit" id="genBtn" class="w-full py-4 rounded-xl font-bold uppercase tracking-widest text-black bg-gradient-to-r from-cyan-400 via-teal-300 to-pink-500 hover:opacity-90 shadow-[0_0_25px_rgba(0,242,254,0.5)] transition flex items-center justify-center space-x-2">
-                            <i data-lucide="radio" class="w-5 h-5"></i>
-                            <span>GENERATE FREE TRACK</span>
-                        </button>
-                    </form>
-                </div>
+        <!-- ĽAVÝ PANEL: Profilové menu & Filtre -->
+        <aside class="lg:col-span-1 space-y-6">
+            <div id="user-quick-card" class="glass-panel p-5 rounded-2xl text-center relative overflow-hidden">
+                <!-- Načítané cez JS -->
             </div>
 
-            <!-- Zoznam skladieb používateľa -->
-            <div class="lg:col-span-7 space-y-6">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-gray-200 flex items-center gap-2">
-                        <i data-lucide="activity" class="text-pink-500 w-5 h-5"></i>
-                        Moje Skladby & Prehrávač
+            <nav class="glass-panel p-4 rounded-2xl space-y-2 font-semibold">
+                <button onclick="showSection('feed')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-cyan-500/10 hover:text-cyan-400 transition text-left">
+                    <i class="fa-solid fa-satellite-dish text-lg"></i>
+                    <span>Stream Médii</span>
+                </button>
+                <button onclick="showSection('profile')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-cyan-500/10 hover:text-cyan-400 transition text-left">
+                    <i class="fa-solid fa-id-card text-lg"></i>
+                    <span>Môj Profil</span>
+                </button>
+                <button id="admin-nav-btn" onclick="showSection('admin')" class="hidden w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-pink-500/10 text-pink-400 transition text-left border border-pink-500/20">
+                    <i class="fa-solid fa-shield-halved text-lg"></i>
+                    <span class="orbitron text-xs uppercase tracking-wider">Admin Panel</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- STREDNÝ PANEL: Obsah (Feed, Profil, Admin) -->
+        <section class="lg:col-span-3 space-y-6">
+
+            <!-- 1. FEED SEKCIA -->
+            <div id="sec-feed" class="space-y-6">
+                <!-- Vytvoriť Príspevok -->
+                <div class="glass-panel p-5 rounded-2xl relative">
+                    <h3 class="orbitron text-cyan-400 text-sm font-bold mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle"></i> Zdieľať Multimédiá (Bez Chatu)
                     </h3>
-                    <span class="text-xs font-mono text-cyan-400/80 animate-pulse">● Live Global Stream</span>
-                </div>
+                    
+                    <div class="space-y-3">
+                        <input id="post-title" type="text" placeholder="Názov príspevku / Popis..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-cyan-400">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <input id="post-img" type="text" placeholder="URL Obrázka (https://...)" class="bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-cyan-400">
+                            <input id="post-audio" type="text" placeholder="URL Hudby MP3 (https://...mp3)" class="bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-cyan-400">
+                        </div>
 
-                <div id="userTracksList" class="space-y-4">
-                    <div class="text-center py-16 text-gray-500 border border-dashed border-gray-800 rounded-2xl glass-panel">
-                        <i data-lucide="music" class="w-12 h-12 mx-auto mb-3 opacity-30"></i>
-                        Zatiaľ žiadne skladby. Zadaj svoj prvý prompt!
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="text-xs text-slate-400"><i class="fa-solid fa-shield-cat mr-1"></i> Autorské práva sú chránené systémom</span>
+                            <button onclick="publishPost()" class="orbitron bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold px-6 py-2 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/20 transition duration-200">
+                                Zverejniť na sieť
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- ================= ADMIN VIEW ================= -->
-        <div id="adminView" class="hidden space-y-6">
-            <div class="glass-panel p-6 rounded-2xl border-pink-500/40 shadow-[0_0_30px_rgba(255,0,127,0.2)]">
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                <!-- Feed Stream -->
+                <div id="posts-container" class="space-y-6">
+                    <!-- Sem sa generujú príspevky -->
+                </div>
+            </div>
+
+            <!-- 2. PROFIL SEKCIA -->
+            <div id="sec-profile" class="hidden glass-panel p-6 rounded-2xl space-y-6">
+                <div class="border-b border-cyan-500/20 pb-4 flex justify-between items-start flex-wrap gap-4">
                     <div>
-                        <h2 class="text-xl font-black text-pink-400 flex items-center gap-2">
-                            <i data-lucide="cpu" class="w-6 h-6"></i> ADMIN HUMAN-AI CORE
+                        <h2 class="orbitron text-2xl font-bold text-white flex items-center gap-2">
+                            <span id="prof-name">Používateľ</span>
+                            <span id="prof-badge" class="hidden text-cyan-400 text-lg"><i class="fa-solid fa-circle-check"></i></span>
                         </h2>
-                        <p class="text-xs text-gray-400">Live rada požiadaviek. Nahraj audio/video alebo vlož priamy link.</p>
+                        <p id="prof-email" class="text-slate-400 text-xs">user@facedanker.network</p>
                     </div>
-                    <div class="text-xs font-mono text-gray-400 bg-black/50 px-4 py-2 rounded-xl border border-gray-700">
-                        Max Audio: <span class="text-cyan-400 font-bold">180 MB</span> | Max Video: <span class="text-pink-400 font-bold">510 MB</span>
+                    <button onclick="requestVerification()" class="orbitron text-xs bg-slate-800 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 px-4 py-2 rounded-xl transition flex items-center gap-2">
+                        <i class="fa-solid fa-award"></i> Požiadať Admina o Overenú Fajku
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                        <label class="text-xs text-cyan-400 orbitron">Miesto Narodenia</label>
+                        <input id="prof-birthplace" type="text" class="w-full bg-transparent border-b border-slate-700 py-1 text-sm focus:outline-none focus:border-cyan-400" placeholder="Napr. Bratislava, Slovensko">
+                    </div>
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                        <label class="text-xs text-cyan-400 orbitron">Aktuálne Bydlisko</label>
+                        <input id="prof-living" type="text" class="w-full bg-transparent border-b border-slate-700 py-1 text-sm focus:outline-none focus:border-cyan-400" placeholder="Napr. Tokio, Japonsko">
+                    </div>
+                    <div class="md:col-span-2 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                        <label class="text-xs text-cyan-400 orbitron">Čo Mám Rád / Moje Záujmy</label>
+                        <textarea id="prof-likes" rows="2" class="w-full bg-transparent border-b border-slate-700 py-1 text-sm focus:outline-none focus:border-cyan-400" placeholder="Cyberpunk, Elektronická hudba, AI umenie, Fotografia..."></textarea>
                     </div>
                 </div>
 
-                <div id="adminQueueList" class="space-y-4">
-                    <div class="text-center py-12 text-gray-500 font-mono">Žiadne čakajúce požiadavky v rade.</div>
+                <button onclick="saveProfile()" class="orbitron text-xs bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl transition">
+                    Uložiť Údaje Profilu
+                </button>
+            </div>
+
+            <!-- 3. ADMIN PANEL -->
+            <div id="sec-admin" class="hidden space-y-6">
+                <div class="glass-panel p-6 rounded-2xl neon-border-pink">
+                    <div class="flex items-center justify-between border-b border-pink-500/20 pb-4 mb-4">
+                        <h2 class="orbitron text-xl font-bold text-pink-500 flex items-center gap-2">
+                            <i class="fa-solid fa-user-shield"></i> FaceDanker Master HUD // Admin
+                        </h2>
+                        <span class="text-xs orbitron bg-pink-500/20 text-pink-400 px-3 py-1 rounded-full">Root Access</span>
+                    </div>
+
+                    <!-- Žiadosti o fajku -->
+                    <div class="space-y-4 mb-8">
+                        <h3 class="orbitron text-sm font-semibold text-cyan-400"><i class="fa-solid fa-certificate"></i> Žiadosti o overený účet (Modrá Fajka)</h3>
+                        <div id="admin-verify-list" class="space-y-2">
+                            <!-- Dynamicky naplnené -->
+                            <p class="text-xs text-slate-500">Žiadne čakajúce žiadosti.</p>
+                        </div>
+                    </div>
+
+                    <!-- Správa Príspevkov a Autorské Práva -->
+                    <div class="space-y-4">
+                        <h3 class="orbitron text-sm font-semibold text-pink-400"><i class="fa-solid fa-gavel"></i> Moderovanie a Autorské Práva (DMCA)</h3>
+                        <div id="admin-posts-list" class="space-y-3">
+                            <!-- Dynamicky naplnené -->
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+
+        </section>
     </main>
 
-    <!-- Modal pre heslo Admina -->
-    <div id="passwordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden">
-        <div class="glass-panel p-6 rounded-2xl max-w-sm w-full border border-pink-500/50 space-y-4">
-            <div class="flex items-center space-x-2 text-pink-400">
-                <i data-lucide="lock" class="w-5 h-5"></i>
-                <h3 class="font-bold text-lg">Zabezpečený Admin Prístup</h3>
-            </div>
-            <p class="text-xs text-gray-400 font-mono">Zadaj tajné heslo administrátora:</p>
-            <input type="password" id="adminPasswordInput" placeholder="Heslo..." 
-                   class="w-full bg-black/60 border border-pink-500/40 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-400 text-white font-mono">
-            <div class="flex gap-2">
-                <button onclick="closeAuthModal()" class="w-1/2 py-2.5 rounded-xl bg-gray-800 text-gray-300 font-mono text-xs">Zrušiť</button>
-                <button onclick="verifyAdminPassword()" class="w-1/2 py-2.5 rounded-xl bg-pink-600 text-white font-mono text-xs font-bold hover:bg-pink-500">Odomknúť</button>
+    <!-- Modal pre Registráciu / Prihlásenie -->
+    <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center hidden z-50 p-4">
+        <div class="glass-panel max-w-md w-full p-6 rounded-2xl border border-cyan-500/40 relative">
+            <h3 id="modal-title" class="orbitron text-xl font-bold text-cyan-400 mb-4 text-center">Prihlásenie do FaceDanker</h3>
+            
+            <div class="space-y-4 text-sm">
+                <div>
+                    <label class="text-xs text-slate-400">Používateľské Meno</label>
+                    <input id="auth-username" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 mt-1 focus:border-cyan-400 focus:outline-none">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">Email (Zadaj admin@facedanker.com pre Admina)</label>
+                    <input id="auth-email" type="email" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 mt-1 focus:border-cyan-400 focus:outline-none">
+                </div>
+                
+                <button onclick="handleAuthSubmit()" class="w-full orbitron bg-gradient-to-r from-cyan-500 to-fuchsia-600 text-slate-950 font-bold py-2.5 rounded-xl uppercase tracking-wider mt-4">
+                    Vstúpiť do siete
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notifikácia -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none glass-panel px-6 py-4 rounded-xl border border-cyan-400 text-cyan-300 font-mono text-sm shadow-2xl flex items-center gap-3">
-        <i data-lucide="info" class="w-5 h-5"></i>
-        <span id="toastMsg">Notifikácia</span>
-    </div>
-
+    <!-- JAVASCRIPT: LOGIKA & MQTT -->
     <script>
-        /* ========================================================================
-           TAJNÉ ADMIN HESLO:
-           ======================================================================== */
-        const ADMIN_SECRET_KEY = "AQ#Admin_9842!CoreX";
+        // MQTT Nastavenia (EMQX Cloud Broker)
+        const MQTT_BROKER = "broker.emqx.io";
+        const MQTT_PORT = 8084; // Secure WSS
+        const MQTT_PATH = "/mqtt";
+        const CLIENT_ID = "FaceDanker_" + Math.random().toString(16).substr(2, 8);
 
-        // Globálna MQTT WebSocket Cloud sieť
-        const TOPIC = "aq_creator_music_ai_stream_v99";
-        const client = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
+        let client;
+        
+        // Globálny Stav Aplikácie
+        let currentUser = JSON.parse(localStorage.getItem('fd_user')) || null;
+        let posts = JSON.parse(localStorage.getItem('fd_posts')) || [];
+        let verifyRequests = JSON.parse(localStorage.getItem('fd_verify_reqs')) || [];
+        let bannedUsers = JSON.parse(localStorage.getItem('fd_banned')) || [];
 
-        let isOnline = false;
-        let isAdmin = false;
-
-        client.on('connect', () => {
-            isOnline = true;
-            document.getElementById('connStatus').className = "px-3 py-1.5 rounded-xl bg-green-950/60 border border-green-500/40 text-green-400 text-xs font-mono flex items-center gap-2";
-            document.getElementById('connStatus').innerHTML = '<span class="w-2 h-2 rounded-full bg-green-400"></span><span>CLOUD ONLINE</span>';
-            client.subscribe(TOPIC);
-            client.publish(TOPIC, JSON.stringify({ type: 'REQ_SYNC' }));
+        // Inicializácia
+        window.addEventListener('DOMContentLoaded', () => {
+            initMQTT();
+            updateUI();
+            renderPosts();
+            if(!currentUser) {
+                document.getElementById('auth-modal').classList.remove('hidden');
+            }
         });
 
-        client.on('offline', () => {
-            document.getElementById('connStatus').className = "px-3 py-1.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-400 text-xs font-mono flex items-center gap-2";
-            document.getElementById('connStatus').innerHTML = '<span class="w-2 h-2 rounded-full bg-red-400"></span><span>OFFLINE</span>';
-        });
+        // ================= MQTT LOGIKA ================= //
+        function initMQTT() {
+            client = new Paho.MQTT.Client(MQTT_BROKER, Number(MQTT_PORT), MQTT_PATH, CLIENT_ID);
 
-        let userId = localStorage.getItem('aq_user_id');
-        if (!userId) {
-            userId = 'usr_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('aq_user_id', userId);
-        }
+            client.onConnectionLost = onConnectionLost;
+            client.onMessageArrived = onMessageArrived;
 
-        let tracks = JSON.parse(localStorage.getItem('aq_cached_tracks') || '{}');
-
-        client.on('message', (topic, message) => {
-            try {
-                const payload = JSON.parse(message.toString());
-                if (payload.type === 'SYNC_ALL' && payload.data) {
-                    tracks = { ...tracks, ...payload.data };
-                    saveTracks();
-                } else if (payload.type === 'REQ_SYNC') {
-                    client.publish(TOPIC, JSON.stringify({ type: 'SYNC_ALL', data: tracks }));
-                } else if (payload.type === 'NEW_TRACK' || payload.type === 'UPDATE_TRACK') {
-                    tracks[payload.track.id] = payload.track;
-                    saveTracks();
+            const options = {
+                useSSL: true,
+                timeout: 5,
+                onSuccess: onConnect,
+                onFailure: (err) => {
+                    console.error("MQTT Chyba pripojenia:", err);
+                    document.getElementById('mqtt-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Offline`;
+                    document.getElementById('mqtt-status').className = "flex items-center text-xs orbitron text-red-400 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/30";
                 }
-                renderUserTracks();
-                if (isAdmin) renderAdminTracks();
-            } catch (err) {
-                console.error("Chyba cloudu:", err);
+            };
+
+            client.connect(options);
+        }
+
+        function onConnect() {
+            console.log("Pripojené k EMQX Global Broker cez WSS!");
+            document.getElementById('mqtt-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-cyan-400 mr-2 animate-pulse"></span> EMQX Live`;
+            document.getElementById('mqtt-status').className = "flex items-center text-xs orbitron text-cyan-400 bg-cyan-400/10 px-3 py-1 rounded-full border border-cyan-400/30";
+
+            // Odber kanálov
+            client.subscribe("facedanker/feed/sync");
+            client.subscribe("facedanker/admin/actions");
+        }
+
+        function onConnectionLost(responseObject) {
+            if (responseObject.errorCode !== 0) {
+                console.log("MQTT Spojenie prerušené:", responseObject.errorMessage);
+                setTimeout(initMQTT, 5000);
             }
-        });
-
-        function saveTracks() {
-            localStorage.setItem('aq_cached_tracks', JSON.stringify(tracks));
         }
 
-        function checkDailyCredits() {
-            const today = new Date().toISOString().slice(0, 10);
-            const usageData = JSON.parse(localStorage.getItem('aq_credits') || '{}');
-            if (usageData.date !== today) {
-                localStorage.setItem('aq_credits', JSON.stringify({ date: today, count: 0 }));
-                return 4;
+        function onMessageArrived(message) {
+            try {
+                const payload = JSON.parse(message.payloadString);
+                
+                if (message.destinationName === "facedanker/feed/sync") {
+                    posts = payload;
+                    localStorage.setItem('fd_posts', JSON.stringify(posts));
+                    renderPosts();
+                } else if (message.destinationName === "facedanker/admin/actions") {
+                    if (payload.type === "VERIFY_UPDATE" && currentUser && currentUser.email === payload.email) {
+                        currentUser.verified = payload.status;
+                        localStorage.setItem('fd_user', JSON.stringify(currentUser));
+                        updateUI();
+                    }
+                }
+            } catch(e) {
+                console.error("Chyba spracovania správy:", e);
             }
-            return Math.max(0, 4 - usageData.count);
         }
 
-        function useCredit() {
-            const today = new Date().toISOString().slice(0, 10);
-            const usageData = JSON.parse(localStorage.getItem('aq_credits') || '{}');
-            const count = (usageData.date === today ? usageData.count : 0) + 1;
-            localStorage.setItem('aq_credits', JSON.stringify({ date: today, count }));
-            updateCreditsUI();
+        function syncPostsMQTT() {
+            if (client && client.isConnected()) {
+                const message = new Paho.MQTT.Message(JSON.stringify(posts));
+                message.destinationName = "facedanker/feed/sync";
+                message.retained = true;
+                client.send(message);
+            }
         }
 
-        function updateCreditsUI() {
-            const remaining = checkDailyCredits();
-            document.getElementById('creditsCount').innerText = `${remaining}/4`;
-            const btn = document.getElementById('genBtn');
-            if (remaining <= 0) {
-                btn.disabled = true;
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-                btn.innerHTML = `<i data-lucide="lock" class="w-5 h-5"></i> <span>DENNÝ LIMIT VYČERPANÝ (4/4)</span>`;
+        // ================= AUTH A PROFIL ================= //
+        function handleAuthSubmit() {
+            const name = document.getElementById('auth-username').value.trim();
+            const email = document.getElementById('auth-email').value.trim().toLowerCase();
+
+            if (!name || !email) return alert("Vyplň všetky polia!");
+
+            const isAdmin = email === "admin@facedanker.com";
+            
+            currentUser = {
+                name: name,
+                email: email,
+                isAdmin: isAdmin,
+                verified: isAdmin, // admin má automaticky fajku
+                birthplace: "Neuvedené",
+                living: "Neuvedené",
+                likes: "Hudba, Umenie, FaceDanker"
+            };
+
+            localStorage.setItem('fd_user', JSON.stringify(currentUser));
+            document.getElementById('auth-modal').classList.add('hidden');
+            updateUI();
+        }
+
+        function logout() {
+            localStorage.removeItem('fd_user');
+            currentUser = null;
+            location.reload();
+        }
+
+        function updateUI() {
+            const userCard = document.getElementById('user-quick-card');
+            const authActions = document.getElementById('auth-actions');
+            const adminNavBtn = document.getElementById('admin-nav-btn');
+
+            if (currentUser) {
+                if (bannedUsers.includes(currentUser.email)) {
+                    alert("Tento účet bol zablokovaný administrátorom.");
+                    logout();
+                    return;
+                }
+
+                userCard.innerHTML = `
+                    <div class="w-16 h-16 rounded-full mx-auto bg-gradient-to-tr from-cyan-400 to-pink-500 p-0.5 shadow-lg shadow-cyan-500/20 mb-3">
+                        <div class="w-full h-full bg-slate-950 rounded-full flex items-center justify-center font-bold text-xl orbitron text-cyan-400">
+                            ${currentUser.name[0].toUpperCase()}
+                        </div>
+                    </div>
+                    <h4 class="font-bold text-white flex items-center justify-center gap-1">
+                        ${currentUser.name}
+                        ${currentUser.verified ? '<i class="fa-solid fa-circle-check text-cyan-400 text-sm"></i>' : ''}
+                    </h4>
+                    <p class="text-xs text-slate-400 mb-3">${currentUser.email}</p>
+                    <div class="text-[11px] text-slate-300 space-y-1 bg-slate-900/60 p-2.5 rounded-xl text-left border border-slate-800">
+                        <div><strong class="text-cyan-400">Narodenie:</strong> ${currentUser.birthplace}</div>
+                        <div><strong class="text-cyan-400">Bydlisko:</strong> ${currentUser.living}</div>
+                    </div>
+                `;
+
+                authActions.innerHTML = `
+                    <button onclick="logout()" class="orbitron text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-xl transition">
+                        Odhlásiť
+                    </button>
+                `;
+
+                // Profil form fields
+                document.getElementById('prof-name').innerText = currentUser.name;
+                document.getElementById('prof-email').innerText = currentUser.email;
+                document.getElementById('prof-birthplace').value = currentUser.birthplace || "";
+                document.getElementById('prof-living').value = currentUser.living || "";
+                document.getElementById('prof-likes').value = currentUser.likes || "";
+                
+                if (currentUser.verified) {
+                    document.getElementById('prof-badge').classList.remove('hidden');
+                } else {
+                    document.getElementById('prof-badge').classList.add('hidden');
+                }
+
+                if (currentUser.isAdmin) {
+                    adminNavBtn.classList.remove('hidden');
+                    renderAdminPanel();
+                }
             } else {
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                btn.innerHTML = `<i data-lucide="radio" class="w-5 h-5"></i> <span>GENERATE FREE TRACK</span>`;
+                userCard.innerHTML = `<p class="text-xs text-slate-400">Nie si prihlásený.</p>`;
             }
-            lucide.createIcons();
         }
 
-        function handleGenerate(e) {
-            e.preventDefault();
-            if (checkDailyCredits() <= 0) {
-                showToast("Vyčerpal si limit 4 skladieb na dnes!", "error");
+        function saveProfile() {
+            if(!currentUser) return;
+            currentUser.birthplace = document.getElementById('prof-birthplace').value;
+            currentUser.living = document.getElementById('prof-living').value;
+            currentUser.likes = document.getElementById('prof-likes').value;
+            localStorage.setItem('fd_user', JSON.stringify(currentUser));
+            updateUI();
+            alert("Profil úspešne aktualizovaný!");
+        }
+
+        function requestVerification() {
+            if(!currentUser) return;
+            if(currentUser.verified) return alert("Už máš overený účet!");
+
+            if(!verifyRequests.some(r => r.email === currentUser.email)) {
+                verifyRequests.push({ name: currentUser.name, email: currentUser.email });
+                localStorage.setItem('fd_verify_reqs', JSON.stringify(verifyRequests));
+                alert("Žiadosť o overenú fajku bola odoslaná Adminovi!");
+            } else {
+                alert("Tvoja žiadosť už čaká na spracovanie.");
+            }
+        }
+
+        // ================= PRÍSPEVKY & MULTIMÉDIÁ ================= //
+        function publishPost() {
+            if (!currentUser) return alert("Najprv sa prihlás!");
+            
+            const title = document.getElementById('post-title').value.trim();
+            const img = document.getElementById('post-img').value.trim();
+            const audio = document.getElementById('post-audio').value.trim();
+
+            if (!title && !img && !audio) return alert("Zadaj aspoň popis, obrázok alebo MP3 skladbu!");
+
+            const newPost = {
+                id: 'post_' + Date.now(),
+                author: currentUser.name,
+                authorEmail: currentUser.email,
+                verified: currentUser.verified,
+                title: title,
+                imgUrl: img,
+                audioUrl: audio,
+                likes: 0,
+                likedBy: [],
+                comments: [],
+                copyright: "Vlastníctvo autora",
+                timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+
+            posts.unshift(newPost);
+            localStorage.setItem('fd_posts', JSON.stringify(posts));
+            
+            // Vyčistenie
+            document.getElementById('post-title').value = '';
+            document.getElementById('post-img').value = '';
+            document.getElementById('post-audio').value = '';
+
+            renderPosts();
+            syncPostsMQTT();
+        }
+
+        function toggleLike(postId) {
+            if (!currentUser) return alert("Musíš sa prihlásiť pre lajkovanie!");
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                const idx = post.likedBy.indexOf(currentUser.email);
+                if (idx > -1) {
+                    post.likedBy.splice(idx, 1);
+                    post.likes--;
+                } else {
+                    post.likedBy.push(currentUser.email);
+                    post.likes++;
+                }
+                localStorage.setItem('fd_posts', JSON.stringify(posts));
+                renderPosts();
+                syncPostsMQTT();
+            }
+        }
+
+        function addComment(postId) {
+            if (!currentUser) return alert("Musíš sa prihlásiť pre komentovanie!");
+            const input = document.getElementById(`comment-input-${postId}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                post.comments.push({
+                    author: currentUser.name,
+                    verified: currentUser.verified,
+                    text: text
+                });
+                localStorage.setItem('fd_posts', JSON.stringify(posts));
+                input.value = '';
+                renderPosts();
+                syncPostsMQTT();
+            }
+        }
+
+        function renderPosts() {
+            const container = document.getElementById('posts-container');
+            container.innerHTML = '';
+
+            if (posts.length === 0) {
+                container.innerHTML = `<div class="glass-panel p-8 text-center text-slate-500 rounded-2xl">Žiadne príspevky na sieti FaceDanker. Buď prvý!</div>`;
                 return;
             }
 
-            const title = document.getElementById('songTitle').value.trim();
-            const style = document.getElementById('songStyle').value.trim();
-            const lyrics = document.getElementById('songLyrics').value.trim();
+            posts.forEach(post => {
+                if (bannedUsers.includes(post.authorEmail)) return; // Nezobrazuj zabanovaných
 
-            const trackId = 'track_' + Date.now();
-            const newTrack = {
-                id: trackId,
-                userId: userId,
-                title: title,
-                style: style,
-                lyrics: lyrics,
-                status: 'GENERATING',
-                eta: 'Čaká na potvrdenie v štúdiu...',
-                fileUrl: '',
-                fileType: '',
-                createdAt: new Date().toLocaleTimeString()
-            };
+                const isLiked = currentUser && post.likedBy.includes(currentUser.email);
 
-            tracks[trackId] = newTrack;
-            saveTracks();
-            client.publish(TOPIC, JSON.stringify({ type: 'NEW_TRACK', track: newTrack }));
-
-            useCredit();
-            document.getElementById('musicForm').reset();
-            renderUserTracks();
-            showToast("Požiadavka odoslaná! Admin ju vidí.");
-        }
-
-        // Vykreslenie skladieb s PREHRÁVAČOM
-        function renderUserTracks() {
-            const list = document.getElementById('userTracksList');
-            const myTracks = Object.values(tracks)
-                .filter(t => t.userId === userId)
-                .sort((a, b) => (b.id > a.id ? 1 : -1));
-
-            if (myTracks.length === 0) return;
-
-            list.innerHTML = '';
-            myTracks.forEach(t => {
-                const isReady = t.status === 'READY';
-                const card = document.createElement('div');
-                card.className = `glass-panel p-5 rounded-2xl border transition-all ${isReady ? 'border-cyan-400 shadow-[0_0_20px_rgba(0,242,254,0.3)]' : 'border-yellow-500/30'}`;
-                
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <h4 class="font-bold text-lg text-white flex items-center gap-2">
-                                ${t.title}
-                                ${isReady 
-                                    ? '<span class="text-xs bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded-full border border-cyan-500/40">READY</span>' 
-                                    : '<span class="text-xs bg-yellow-500/20 text-yellow-300 px-2.5 py-0.5 rounded-full border border-yellow-500/40 animate-pulse">GENERATING</span>'
-                                }
-                            </h4>
-                            <p class="text-xs text-pink-400 font-mono mt-1">${t.style}</p>
-                        </div>
-                        <span class="text-xs text-gray-500 font-mono">${t.createdAt}</span>
-                    </div>
-
-                    <div class="bg-black/40 p-3 rounded-xl mb-4 text-xs font-mono text-gray-400 max-h-20 overflow-y-auto whitespace-pre-wrap border border-gray-800">
-                        ${t.lyrics}
-                    </div>
-
-                    ${!isReady ? `
-                        <div class="flex items-center space-x-3 bg-yellow-950/20 p-3.5 rounded-xl border border-yellow-500/20">
-                            <div class="w-4 h-4 rounded-full border-2 border-yellow-400 border-t-transparent animate-spin"></div>
-                            <div class="text-xs font-mono text-yellow-300">
-                                Odhadovaný čas (ETA): <span class="font-bold text-white">${t.eta}</span>
-                            </div>
-                        </div>
-                    ` : `
-                        <!-- INTERAKTÍVNY PREHRÁVAČ -->
-                        <div class="space-y-3 pt-2 bg-black/50 p-4 rounded-xl border border-cyan-500/30">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-mono text-cyan-300 flex items-center gap-2">
-                                    <i data-lucide="volume-2" class="w-4 h-4 text-cyan-400"></i> AI Generated Audio Output
-                                </span>
-                                <!-- Ekvalizér -->
-                                <div class="flex items-end gap-1 h-5">
-                                    <div class="eq-bar"></div>
-                                    <div class="eq-bar"></div>
-                                    <div class="eq-bar"></div>
-                                    <div class="eq-bar"></div>
-                                    <div class="eq-bar"></div>
+                const postHtml = `
+                    <article class="glass-panel p-5 rounded-2xl space-y-4">
+                        <!-- Hlavička Príspevku -->
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-800 border border-cyan-500/40 flex items-center justify-center font-bold text-cyan-400 orbitron">
+                                    ${post.author[0].toUpperCase()}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white flex items-center gap-1.5">
+                                        ${post.author}
+                                        ${post.verified ? '<i class="fa-solid fa-circle-check text-cyan-400 text-xs"></i>' : ''}
+                                    </h4>
+                                    <span class="text-[10px] text-slate-400">${post.timestamp} • <i class="fa-solid fa-copyright"></i> ${post.copyright}</span>
                                 </div>
                             </div>
-
-                            ${t.fileType && t.fileType.includes('video') ? `
-                                <video src="${t.fileUrl}" controls class="w-full rounded-xl max-h-64 bg-black border border-gray-800"></video>
-                            ` : `
-                                <audio src="${t.fileUrl}" controls class="w-full h-11 rounded-lg bg-gray-900"></audio>
-                            `}
-                            
-                            <a href="${t.fileUrl}" download="${t.title}.${t.fileType && t.fileType.includes('video') ? 'mp4' : 'mp3'}" 
-                               class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-400 to-pink-500 hover:opacity-90 text-black font-bold font-mono text-xs flex items-center justify-center space-x-2 transition shadow-[0_0_15px_rgba(0,242,254,0.4)]">
-                                <i data-lucide="download" class="w-4 h-4"></i>
-                                <span>STIAHNUŤ SKLADBU (ZADARMO)</span>
-                            </a>
                         </div>
-                    `}
-                `;
-                list.appendChild(card);
-            });
-            lucide.createIcons();
-        }
 
-        // Vykreslenie Admina
-        function renderAdminTracks() {
-            const list = document.getElementById('adminQueueList');
-            const allTracks = Object.values(tracks).sort((a, b) => (b.id > a.id ? 1 : -1));
+                        <!-- Popis / Text -->
+                        ${post.title ? `<p class="text-sm text-slate-200">${post.title}</p>` : ''}
 
-            if (allTracks.length === 0) return;
+                        <!-- Obrázok -->
+                        ${post.imgUrl ? `
+                            <div class="rounded-xl overflow-hidden border border-slate-800 max-h-[450px] bg-slate-950 flex items-center justify-center">
+                                <img src="${post.imgUrl}" alt="Media" class="w-full object-cover object-center max-h-[450px]" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800'">
+                            </div>
+                        ` : ''}
 
-            list.innerHTML = '';
-            allTracks.forEach(t => {
-                const card = document.createElement('div');
-                card.className = "p-5 rounded-2xl bg-black/60 border border-pink-500/30 space-y-4";
+                        <!-- Audio Prehrávač -->
+                        ${post.audioUrl ? `
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-cyan-500/20 flex flex-col gap-2">
+                                <div class="flex items-center gap-2 text-xs orbitron text-cyan-400">
+                                    <i class="fa-solid fa-music animate-bounce"></i> MP3 Prehrávač
+                                </div>
+                                <audio controls class="w-full h-8">
+                                    <source src="${post.audioUrl}" type="audio/mpeg">
+                                    Tvoj prehliadač nepodporuje audio element.
+                                </audio>
+                            </div>
+                        ` : ''}
 
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-xs text-gray-500 font-mono">Užívateľ: ${t.userId}</span>
-                            <h4 class="text-lg font-bold text-white">${t.title}</h4>
-                            <p class="text-xs text-cyan-400 font-mono">${t.style}</p>
-                        </div>
-                        <span class="text-xs px-2.5 py-1 rounded bg-pink-950/60 text-pink-300 font-mono border border-pink-500/30">${t.status}</span>
-                    </div>
-
-                    <div class="p-3 bg-gray-900 rounded-xl text-xs font-mono text-gray-300 whitespace-pre-wrap max-h-24 overflow-y-auto">
-                        ${t.lyrics}
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-800">
-                        <!-- Nastavenie ETA -->
-                        <div class="flex gap-2">
-                            <input type="text" id="eta_${t.id}" placeholder="napr. 5 minút" value="${t.eta.includes('Čaká') ? '' : t.eta}"
-                                class="bg-black/50 border border-gray-700 rounded-lg px-3 py-1 text-xs text-white flex-1 focus:outline-none focus:border-pink-400">
-                            <button onclick="updateETA('${t.id}')" class="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-mono">
-                                Nastaviť ETA
+                        <!-- Lajky a Počítadlá -->
+                        <div class="flex items-center space-x-4 pt-2 border-t border-slate-800/80 text-xs">
+                            <button onclick="toggleLike('${post.id}')" class="flex items-center gap-1.5 ${isLiked ? 'text-pink-500 font-bold' : 'text-slate-400 hover:text-pink-400'} transition">
+                                <i class="fa-heart ${isLiked ? 'fa-solid' : 'fa-regular'} text-base"></i>
+                                <span>${post.likes} Lajkov</span>
                             </button>
+                            <span class="text-slate-500">•</span>
+                            <span class="text-slate-400"><i class="fa-regular fa-comment mr-1"></i> ${post.comments.length} Komentárov</span>
                         </div>
 
-                        <!-- Vloženie súboru / Linku -->
-                        <div class="flex flex-col gap-2">
-                            <input type="text" id="link_${t.id}" placeholder="Priamy link na audio/video..." class="bg-black/50 border border-gray-700 rounded-lg px-2 py-1 text-xs text-white">
-                            <div class="flex items-center gap-2">
-                                <input type="file" id="file_${t.id}" accept="audio/*,video/*" class="text-xs text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-cyan-500/20 file:text-cyan-300 file:text-xs">
-                                <button onclick="uploadFinishedTrack('${t.id}')" class="px-3 py-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-lg text-xs font-mono">
-                                    Dokončiť
+                        <!-- Zoznam Komentárov -->
+                        <div class="space-y-2 pt-2">
+                            ${post.comments.map(c => `
+                                <div class="text-xs bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
+                                    <span class="font-bold text-cyan-400 mr-1">${c.author}${c.verified ? ' ✓' : ''}:</span>
+                                    <span class="text-slate-300">${c.text}</span>
+                                </div>
+                            `).join('')}
+
+                            <!-- Vstup pre Komentár (Písanie správ/chatu je zakázané, len komentovanie médií) -->
+                            <div class="flex gap-2 pt-1">
+                                <input id="comment-input-${post.id}" type="text" placeholder="Napíš komentár k médiu..." class="flex-1 bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-cyan-400">
+                                <button onclick="addComment('${post.id}')" class="bg-cyan-500/20 border border-cyan-500/40 hover:bg-cyan-500/40 text-cyan-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                                    <i class="fa-solid fa-paper-plane"></i>
                                 </button>
                             </div>
                         </div>
+                    </article>
+                `;
+                container.innerHTML += postHtml;
+            });
+        }
+
+        // ================= ADMIN LOGIKA ================= //
+        function renderAdminPanel() {
+            if (!currentUser || !currentUser.isAdmin) return;
+
+            // 1. Žiadosti o fajku
+            const verifyContainer = document.getElementById('admin-verify-list');
+            verifyContainer.innerHTML = '';
+
+            if (verifyRequests.length === 0) {
+                verifyContainer.innerHTML = `<p class="text-xs text-slate-500">Žiadne čakajúce žiadosti o fajku.</p>`;
+            } else {
+                verifyRequests.forEach((req, idx) => {
+                    verifyContainer.innerHTML += `
+                        <div class="flex items-center justify-between bg-slate-900/70 p-3 rounded-xl border border-cyan-500/30 text-xs">
+                            <div>
+                                <span class="font-bold text-white">${req.name}</span>
+                                <span class="text-slate-400 ml-2">(${req.email})</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="grantVerification('${req.email}', ${idx})" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-3 py-1 rounded-lg">
+                                    Udeliť Fajku ✓
+                                </button>
+                                <button onclick="rejectVerification(${idx})" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg">
+                                    Zmazať
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // 2. Správa príspevkov, autorské práva & BANY
+            const postsContainer = document.getElementById('admin-posts-list');
+            postsContainer.innerHTML = '';
+
+            posts.forEach(post => {
+                postsContainer.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-900/70 p-3 rounded-xl border border-slate-800 text-xs flex-wrap gap-2">
+                        <div class="max-w-md">
+                            <span class="font-bold text-pink-400">${post.author}</span>: "${post.title || 'Médiá bez názvu'}"
+                            <div class="text-[10px] text-slate-500">ID: ${post.id} | Práva: ${post.copyright}</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="setCopyright('${post.id}')" class="bg-purple-600/30 border border-purple-500 text-purple-300 hover:bg-purple-600/50 px-2.5 py-1 rounded-lg">
+                                Zmeniť Copyright
+                            </button>
+                            <button onclick="adminDeletePost('${post.id}')" class="bg-red-500/20 border border-red-500 text-red-400 hover:bg-red-500/40 px-2.5 py-1 rounded-lg">
+                                Blokovať / Zmazať
+                            </button>
+                            <button onclick="banUser('${post.authorEmail}')" class="bg-red-600 hover:bg-red-700 text-white font-bold px-2.5 py-1 rounded-lg">
+                                BAN Používateľa
+                            </button>
+                        </div>
                     </div>
                 `;
-                list.appendChild(card);
             });
-            lucide.createIcons();
         }
 
-        function updateETA(id) {
-            const etaVal = document.getElementById(`eta_${id}`).value;
-            if (tracks[id]) {
-                tracks[id].eta = etaVal;
-                tracks[id].status = 'GENERATING';
-                saveTracks();
-                client.publish(TOPIC, JSON.stringify({ type: 'UPDATE_TRACK', track: tracks[id] }));
-                showToast("ETA čas bol okamžite odoslaný!");
-            }
-        }
+        function grantVerification(email, reqIndex) {
+            verifyRequests.splice(reqIndex, 1);
+            localStorage.setItem('fd_verify_reqs', JSON.stringify(verifyRequests));
 
-        function uploadFinishedTrack(id) {
-            const directLink = document.getElementById(`link_${id}`).value.trim();
-            const fileInput = document.getElementById(`file_${id}`);
-            const file = fileInput.files[0];
-
-            if (directLink) {
-                tracks[id].fileUrl = directLink;
-                tracks[id].fileType = directLink.endsWith('.mp4') ? 'video/mp4' : 'audio/mp3';
-                tracks[id].status = 'READY';
-                tracks[id].eta = 'Dokončené';
-                saveTracks();
-                client.publish(TOPIC, JSON.stringify({ type: 'UPDATE_TRACK', track: tracks[id] }));
-                showToast("Skladba bola odoslaná!");
-                renderAdminTracks();
-                return;
+            // Odoslanie cez MQTT
+            if (client && client.isConnected()) {
+                const action = { type: "VERIFY_UPDATE", email: email, status: true };
+                const msg = new Paho.MQTT.Message(JSON.stringify(action));
+                msg.destinationName = "facedanker/admin/actions";
+                client.send(msg);
             }
 
-            if (!file) {
-                showToast("Vyber audio/video súbor alebo vlož link!", "error");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                tracks[id].fileUrl = e.target.result;
-                tracks[id].fileType = file.type;
-                tracks[id].status = 'READY';
-                tracks[id].eta = 'Dokončené';
-                saveTracks();
-                client.publish(TOPIC, JSON.stringify({ type: 'UPDATE_TRACK', track: tracks[id] }));
-                showToast("Skladba bola úspešne odoslaná používateľovi!");
-                renderAdminTracks();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Admin Prihlásenie
-        function handleAdminAuth() {
-            if (isAdmin) {
-                isAdmin = false;
-                toggleView();
-                return;
-            }
-            document.getElementById('passwordModal').classList.remove('hidden');
-            document.getElementById('adminPasswordInput').value = '';
-            document.getElementById('adminPasswordInput').focus();
-        }
-
-        function closeAuthModal() {
-            document.getElementById('passwordModal').classList.add('hidden');
-        }
-
-        function verifyAdminPassword() {
-            const input = document.getElementById('adminPasswordInput').value;
-            if (input === ADMIN_SECRET_KEY) {
-                isAdmin = true;
-                closeAuthModal();
-                toggleView();
-                renderAdminTracks();
-                showToast("Admin odomknutý!");
-            } else {
-                showToast("Nesprávne heslo!", "error");
-                document.getElementById('adminPasswordInput').value = '';
-            }
-        }
-
-        function toggleView() {
-            document.getElementById('userView').classList.toggle('hidden', isAdmin);
-            document.getElementById('adminView').classList.toggle('hidden', !isAdmin);
+            // Lokálna zmena ak ide o príspevky
+            posts.forEach(p => {
+                if (p.authorEmail === email) p.verified = true;
+            });
+            localStorage.setItem('fd_posts', JSON.stringify(posts));
             
-            document.getElementById('modeText').innerText = isAdmin ? 'User Studio' : 'Admin Core';
-            document.getElementById('modeToggleBtn').classList.toggle('border-pink-500', isAdmin);
-            document.getElementById('modeToggleBtn').classList.toggle('text-pink-300', isAdmin);
-            lucide.createIcons();
+            renderAdminPanel();
+            renderPosts();
+            syncPostsMQTT();
+            alert(`Používateľovi ${email} bol udelený Overený Účet!`);
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').innerText = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3500);
+        function rejectVerification(idx) {
+            verifyRequests.splice(idx, 1);
+            localStorage.setItem('fd_verify_reqs', JSON.stringify(verifyRequests));
+            renderAdminPanel();
         }
 
-        document.getElementById('adminPasswordInput').addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') verifyAdminPassword();
-        });
+        function adminDeletePost(postId) {
+            if (!confirm("Naozaj chceš odstrániť tento príspevok zo siete?")) return;
+            posts = posts.filter(p => p.id !== postId);
+            localStorage.setItem('fd_posts', JSON.stringify(posts));
+            renderPosts();
+            renderAdminPanel();
+            syncPostsMQTT();
+        }
 
-        updateCreditsUI();
-        renderUserTracks();
-        lucide.createIcons();
+        function banUser(email) {
+            if (email === "admin@facedanker.com") return alert("Nemožno zabanovať hlavného Admina!");
+            if (!confirm(`Chceš úplne zablokovať používateľa ${email}?`)) return;
+
+            if (!bannedUsers.includes(email)) {
+                bannedUsers.push(email);
+                localStorage.setItem('fd_banned', JSON.stringify(bannedUsers));
+            }
+            renderPosts();
+            renderAdminPanel();
+            alert(`Používateľ ${email} bol zabanovaný.`);
+        }
+
+        function setCopyright(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+            const newCopy = prompt("Zadaj informáciu o autorských právach (napr. FaceDanker Verified DMCA alebo Licencia CC):", post.copyright);
+            if (newCopy) {
+                post.copyright = newCopy;
+                localStorage.setItem('fd_posts', JSON.stringify(posts));
+                renderPosts();
+                renderAdminPanel();
+                syncPostsMQTT();
+            }
+        }
+
+        // ================= PREPÍNANIE SEKCÍI ================= //
+        function showSection(section) {
+            document.getElementById('sec-feed').classList.add('hidden');
+            document.getElementById('sec-profile').classList.add('hidden');
+            document.getElementById('sec-admin').classList.add('hidden');
+
+            if (section === 'feed') document.getElementById('sec-feed').classList.remove('hidden');
+            if (section === 'profile') document.getElementById('sec-profile').classList.remove('hidden');
+            if (section === 'admin') {
+                document.getElementById('sec-admin').classList.remove('hidden');
+                renderAdminPanel();
+            }
+        }
     </script>
 </body>
 </html>
