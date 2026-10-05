@@ -3,8 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GAMEPLA631 Info — Oficiálny informačný portál</title>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   
+  <!-- SEO & Social Sharing (Pre GitHub Pages) -->
+  <title>GAMEPLA631 Info — Oficiálny informačný portál</title>
+  <meta name="description" content="Informačný a oznamovací portál GAMEPLA631 Info. Systémové správy, dôležité upozornenia a aktualizácie v reálnom čase." />
+  <meta property="og:title" content="GAMEPLA631 Info" />
+  <meta property="og:description" content="Oficiálny informačný portál a systémové oznamy." />
+  <meta property="og:type" content="website" />
+
+  <!-- Vstavaná SVG Favicon (zabraňuje 404 chybe na GitHube) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -13,7 +23,7 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
           },
           colors: {
             brand: {
@@ -41,7 +51,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- Quill.js Rich Text Editor -->
   <link href="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.snow.css" rel="stylesheet">
@@ -57,20 +67,12 @@
       color: #e2e8f0;
       scroll-behavior: smooth;
     }
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #090d16;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #334155;
-    }
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    
     /* Glassmorphism */
     .glass-panel {
       background: rgba(17, 23, 38, 0.85);
@@ -78,9 +80,10 @@
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.07);
     }
+    
     /* Article Typography */
-    .article-content h1 { font-size: 1.6rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: #fff; }
-    .article-content h2 { font-size: 1.35rem; font-weight: 600; margin-top: 0.8rem; margin-bottom: 0.4rem; color: #f1f5f9; }
+    .article-content h1 { font-size: 1.5rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: #fff; }
+    .article-content h2 { font-size: 1.25rem; font-weight: 600; margin-top: 0.8rem; margin-bottom: 0.4rem; color: #f1f5f9; }
     .article-content p { margin-bottom: 0.75rem; line-height: 1.7; color: #cbd5e1; }
     .article-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.75rem; }
     .article-content ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.75rem; }
@@ -93,19 +96,20 @@
       margin: 1rem 0;
     }
     .article-content a { color: #818cf8; text-decoration: underline; }
-    /* Quill Dark Overrides */
+
+    /* Quill Overrides */
     .ql-toolbar.ql-snow {
       border-color: #1e293b !important;
       background: #0f172a;
-      border-top-left-radius: 0.5rem;
-      border-top-right-radius: 0.5rem;
+      border-top-left-radius: 0.75rem;
+      border-top-right-radius: 0.75rem;
     }
     .ql-container.ql-snow {
       border-color: #1e293b !important;
       background: #111726;
       color: #e2e8f0;
-      border-bottom-left-radius: 0.5rem;
-      border-bottom-right-radius: 0.5rem;
+      border-bottom-left-radius: 0.75rem;
+      border-bottom-right-radius: 0.75rem;
       font-family: 'Inter', sans-serif;
       min-height: 200px;
     }
@@ -115,7 +119,7 @@
     .ql-snow .ql-picker-options { background-color: #1e293b !important; border-color: #334155 !important; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col antialiased">
 
   <!-- Ambient Glow Background -->
   <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-indigo-600/10 blur-[130px] -z-10 pointer-events-none rounded-full"></div>
@@ -124,7 +128,7 @@
   <header class="sticky top-0 z-40 glass-panel border-b border-white/5 px-4 sm:px-8 py-3.5">
     <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
       
-      <!-- Brand Logo -->
+      <!-- Logo -->
       <a href="#" class="flex items-center gap-3 group">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
           <i class="fa-solid fa-satellite-dish"></i>
@@ -133,61 +137,57 @@
           <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
             GAMEPLA631 <span class="text-brand-500">Info</span>
           </span>
-          <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Informačný & Oznamovací Portál</p>
+          <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Informačný Portál</p>
         </div>
       </a>
 
-      <!-- Right Header Actions -->
+      <!-- Actions -->
       <div class="flex items-center gap-3">
-        <!-- MQTT Status Badge -->
+        <!-- Live Status -->
         <div id="statusBadge" class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-slate-800/80 border border-slate-700 text-slate-400 transition-all">
           <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping" id="statusDot"></span>
           <span id="statusText">Pripájanie...</span>
         </div>
 
-        <!-- Admin Active Badge (Visible only when logged in) -->
+        <!-- Admin Indicator -->
         <div id="adminIndicator" class="hidden items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
           <i class="fa-solid fa-user-shield"></i>
-          <span>Admin Režim</span>
+          <span class="hidden md:inline">Admin Režim</span>
         </div>
 
-        <!-- Add Post Button (Admin Only) -->
-        <button id="btnNewPost" onclick="openPostModal()" class="hidden items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-medium text-xs sm:text-sm px-4 py-2 rounded-lg shadow-md shadow-brand-600/30 transition-all">
+        <!-- New Post Button -->
+        <button id="btnNewPost" onclick="openPostModal()" class="hidden items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-medium text-xs sm:text-sm px-4 py-2 rounded-xl shadow-md shadow-brand-600/30 transition-all">
           <i class="fa-solid fa-plus"></i>
-          <span>Pridať Oznam</span>
+          <span>Nový Oznam</span>
         </button>
 
-        <!-- Admin Unlock Button (Secret/Discreet) -->
-        <button onclick="handleAdminButtonClick()" title="Administrácia (Klávesová skratka: Ctrl + Shift + A)" class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent hover:border-slate-700 transition">
+        <!-- Lock/Unlock Icon -->
+        <button onclick="handleAdminButtonClick()" title="Administrácia (Ctrl + Shift + A)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800 hover:border-slate-700 transition">
           <i id="lockIcon" class="fa-solid fa-lock text-sm"></i>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- ================= MAIN CONTAINER ================= -->
+  <!-- ================= MAIN ================= -->
   <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-8 py-8 space-y-8">
 
-    <!-- URGENT HERO BANNER (Visible if urgent alert exists) -->
-    <section id="urgentHero" class="hidden">
-      <!-- Injected via JavaScript -->
-    </section>
+    <!-- URGENT HERO BANNER -->
+    <section id="urgentHero" class="hidden"></section>
 
     <!-- SEARCH & FILTER TOOLBAR -->
     <section class="glass-panel p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
-      <!-- Search Input -->
       <div class="relative w-full md:w-80">
         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
         <input 
           type="text" 
           id="searchInput" 
           oninput="handleSearch(this.value)"
-          placeholder="Hľadať v textoch a oznamoch..." 
+          placeholder="Hľadať v správach a textoch..." 
           class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition"
         />
       </div>
 
-      <!-- Category Filter Tabs -->
       <div class="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 text-xs sm:text-sm">
         <button onclick="setFilter('all')" data-filter="all" class="filter-btn active px-3.5 py-2 rounded-xl font-medium bg-brand-600 text-white transition">
           Všetko (<span id="count-all">0</span>)
@@ -207,34 +207,24 @@
       </div>
     </section>
 
-    <!-- FEED SECTION -->
+    <!-- FEED LIST -->
     <section>
-      <!-- Feed Header -->
       <div class="flex items-center justify-between mb-5">
         <h2 class="text-xl font-bold text-white flex items-center gap-2">
           <i class="fa-solid fa-layer-group text-brand-500"></i>
           <span id="feedTitle">Všetky publikované oznamy</span>
         </h2>
-        <span id="filteredCountText" class="text-xs text-slate-400 font-medium">Zobrazených 0 textov</span>
+        <span id="filteredCountText" class="text-xs text-slate-400 font-medium">Načítavam...</span>
       </div>
 
-      <!-- Articles Container -->
-      <div id="articlesList" class="space-y-6">
-        <!-- Skeleton loading placeholder -->
-        <div class="glass-panel p-6 rounded-2xl animate-pulse space-y-4">
-          <div class="h-6 bg-slate-800 rounded w-1/3"></div>
-          <div class="h-4 bg-slate-800 rounded w-full"></div>
-          <div class="h-4 bg-slate-800 rounded w-4/5"></div>
-        </div>
-      </div>
+      <div id="articlesList" class="space-y-6"></div>
 
-      <!-- Empty State -->
       <div id="emptyState" class="hidden text-center py-16 glass-panel rounded-2xl">
         <div class="w-16 h-16 bg-slate-800/60 rounded-full flex items-center justify-center mx-auto text-slate-500 text-2xl mb-4">
           <i class="fa-regular fa-folder-open"></i>
         </div>
         <h3 class="text-lg font-bold text-slate-300 mb-1">Žiadne oznamy na zobrazenie</h3>
-        <p class="text-sm text-slate-500 max-w-sm mx-auto">V tejto kategórii alebo vyhľadávaní sa zatiaľ nenachádzajú žiadne zverejnené informácie.</p>
+        <p class="text-sm text-slate-500 max-w-sm mx-auto">V tejto kategórii alebo vyhľadávaní sa zatiaľ nenachádzajú žiadne informácie.</p>
       </div>
     </section>
 
@@ -245,7 +235,7 @@
     <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div>
         <p class="font-semibold text-slate-400">&copy; <span id="currentYear"></span> GAMEPLA631 Info. Všetky práva vyhradené.</p>
-        <p class="mt-1 text-[11px]">Globálna synchronizácia v reálnom čase zabezpečená cez EMQX Cloud MQTT.</p>
+        <p class="mt-1 text-[11px]">Globálna real-time synchronizácia cez EMQX Cloud Broker (GitHub Pages Ready).</p>
       </div>
       <div class="flex items-center gap-3">
         <span class="text-[11px] text-slate-500 bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-md">
@@ -255,7 +245,7 @@
     </div>
   </footer>
 
-  <!-- ================= ADMIN PIN MODAL ================= -->
+  <!-- ================= PIN MODAL ================= -->
   <div id="pinModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="glass-panel w-full max-w-md p-6 sm:p-8 rounded-2xl shadow-2xl border border-white/10 relative">
       <button onclick="closePinModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
@@ -267,8 +257,8 @@
           <i class="fa-solid fa-shield-halved"></i>
         </div>
         <h3 class="text-xl font-bold text-white">Vstup do Administrácie</h3>
-        <p class="text-xs text-slate-400 mt-1">Zadaj PIN kód vlastníka na povolenie pridávania a úprav.</p>
-        <p class="text-[11px] text-brand-400/80 mt-0.5">Predvolený PIN: <span class="font-mono font-bold">6310</span></p>
+        <p class="text-xs text-slate-400 mt-1">Zadajte PIN kód vlastníka na publikovanie a úpravy.</p>
+        <p class="text-[11px] text-brand-400/80 mt-1 font-mono">Predvolený PIN: <strong>6310</strong></p>
       </div>
 
       <form onsubmit="handlePinSubmit(event)" class="space-y-4">
@@ -277,7 +267,7 @@
             type="password" 
             id="adminPinInput" 
             maxlength="8"
-            placeholder="Zadaj PIN..." 
+            placeholder="****" 
             class="w-full text-center text-2xl tracking-widest font-mono bg-slate-900 border border-slate-700 rounded-xl py-3 text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500"
             autofocus
           />
@@ -290,7 +280,7 @@
             Zrušiť
           </button>
           <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold transition shadow-lg shadow-brand-600/30">
-            Overiť a vstúpiť
+            Overiť PIN
           </button>
         </div>
       </form>
@@ -301,65 +291,57 @@
   <div id="postModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
     <div class="glass-panel w-full max-w-3xl my-8 p-6 sm:p-8 rounded-2xl shadow-2xl border border-white/10 relative max-h-[90vh] flex flex-col">
       
-      <!-- Modal Header -->
       <div class="flex items-center justify-between pb-4 border-b border-slate-800">
         <div>
-          <h3 id="modalTitle" class="text-xl font-bold text-white">Nový oznam / článok</h3>
-          <p class="text-xs text-slate-400">Vyplňte podrobnosti. Zmena sa okamžite zosynchronizuje so všetkými čitateľmi.</p>
+          <h3 id="modalTitle" class="text-xl font-bold text-white">Nový oznam</h3>
+          <p class="text-xs text-slate-400">Zmena sa okamžite zosynchronizuje do cloudu pre všetkých čitateľov.</p>
         </div>
         <button onclick="closePostModal()" class="text-slate-400 hover:text-white text-xl">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <!-- Modal Body (Form) -->
       <form id="postForm" onsubmit="handlePostSubmit(event)" class="space-y-4 pt-4 overflow-y-auto pr-1">
         <input type="hidden" id="editArticleId" value="" />
 
-        <!-- Title -->
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Názov oznamu *</label>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Názov oznamu / článku *</label>
           <input 
             type="text" 
             id="postTitle" 
             required 
-            placeholder="Napr. Dôležitá zmena pravidiel / Plánovaná odstávka systému..." 
+            placeholder="Napr. Dôležité systémové upozornenie..." 
             class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500"
           />
         </div>
 
-        <!-- Category & Options Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <!-- Category -->
           <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Typ / Kategória *</label>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Kategória *</label>
             <select id="postCategory" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500">
               <option value="urgent">🔴 Dôležité Upozornenie (Červené)</option>
               <option value="notice">🟡 Systémový Oznam (Žltý)</option>
-              <option value="update">🔵 Aktualizácia / Update (Modrý)</option>
-              <option value="news">🟣 Správa / Článok (Fialový)</option>
+              <option value="update">🔵 Aktualizácia (Modrá)</option>
+              <option value="news">🟣 Správa / Článok (Fialová)</option>
             </select>
           </div>
 
-          <!-- Pinned Option -->
           <div class="flex items-end pb-1.5">
             <label class="flex items-center gap-3 cursor-pointer bg-slate-900 border border-slate-800 p-2.5 rounded-xl w-full hover:border-slate-700 transition">
               <input type="checkbox" id="postPinned" class="w-4 h-4 text-brand-600 rounded bg-slate-800 border-slate-700 focus:ring-brand-500 focus:ring-2" />
               <div class="text-xs">
                 <span class="font-semibold text-slate-200 block"><i class="fa-solid fa-thumbtack text-brand-400 mr-1"></i> Pripnúť na vrch (Banner)</span>
-                <span class="text-slate-400 text-[11px]">Zobrazí sa vo veľkom bannere na vrchu</span>
+                <span class="text-slate-400 text-[11px]">Zvýrazní sa v hlavnom banneri</span>
               </div>
             </label>
           </div>
         </div>
 
-        <!-- Rich Text Editor Container -->
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Obsah textu / správy *</label>
-          <div id="quillEditor" class="min-h-[220px] rounded-b-xl"></div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Obsah textu *</label>
+          <div id="quillEditor" class="min-h-[220px]"></div>
         </div>
 
-        <!-- Modal Footer -->
         <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
           <button type="button" onclick="closePostModal()" class="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 text-sm font-medium transition">
             Zrušiť
@@ -373,21 +355,22 @@
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
+  <!-- TOAST ALERT -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none glass-panel px-5 py-3 rounded-xl border border-white/10 shadow-2xl flex items-center gap-3 text-sm">
     <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
     <span id="toastMsg" class="font-medium text-slate-200">Operácia prebehla úspešne</span>
   </div>
 
-  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <!-- ================= LOGIC SCRIPT ================= -->
   <script>
-    /* ================= APP STATE & CONFIG ================= */
     const CONFIG = {
-      MQTT_BROKER: "wss://broker.emqx.io:8084/mqtt",
+      MQTT_HOST: "broker.emqx.io",
+      MQTT_PORT: 8084,
+      MQTT_PATH: "/mqtt",
       MQTT_TOPIC: "gamepla631/info/articles",
-      ADMIN_PIN: "6310", // Tajný PIN kód
-      STORAGE_KEY: "gamepla631_articles_cache",
-      AUTH_KEY: "gamepla631_admin_auth"
+      ADMIN_PIN: "6310",
+      STORAGE_KEY: "gamepla631_articles_v2",
+      AUTH_KEY: "gamepla631_auth_state"
     };
 
     let state = {
@@ -399,45 +382,25 @@
       quill: null
     };
 
-    // Predvolené vzorové články, ak broker ešte nemá žiadne dáta
-    const INITIAL_DEMO_DATA = [
+    const INITIAL_DEMO = [
       {
         id: "demo-1",
-        title: "Dôležité systémové upozornenie: Plánovaná údržba a optimalizácia serverov",
+        title: "Dôležité systémové upozornenie: Optimalizácia siete a portálu",
         category: "urgent",
         pinned: true,
-        content: "<p>Vážení návštevníci a používatelia,</p><p>chceme vás informovať o <strong>plánovanej technickej údržbe</strong> našej cloudovej infraštruktúry. Počas tohto okna môže dôjsť ku krátkodobým výpadkom synchronizácie dát.</p><ul><li><strong>Dátum:</strong> Túto nedeľu od 02:00 do 05:00 SEČ</li><li><strong>Dôvod:</strong> Nasadenie nových bezpečnostných záplat a zrýchlenie databázovej synchronizácie.</li></ul><p>Všetky publikované oznamy zostávajú bezpečne uchované v offline vyrovnávacej pamäti.</p>",
-        createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-        readTime: "2 min"
-      },
-      {
-        id: "demo-2",
-        title: "Vitajte na novom informačnom portáli GAMEPLA631 Info",
-        category: "news",
-        pinned: false,
-        content: "<p>S radosťou spúšťame oficiálny, moderný a vysoko responzívny informačný portál <strong>GAMEPLA631 Info</strong>.</p><p>Tento portál slúži ako centrálny komunikačný bod pre zverejňovanie dlhých textov, pravidiel, oznamov a aktualizácií v reálnom čase bez nutnosti akejkoľvek registrácie pre čitateľov.</p><blockquote>Všetky informácie sú okamžite synchronizované naprieč celým svetom vďaka MQTT sieti.</blockquote>",
-        createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-        readTime: "1 min"
-      },
-      {
-        id: "demo-3",
-        title: "Aktualizácia pravidiel a protokolov verzia 2.4",
-        category: "update",
-        pinned: false,
-        content: "<p>Boli upravené podmienky používania a protokoly pre odosielanie správ. Prečítajte si súhrn najdôležitejších zmien:</p><ol><li>Zvýšená stabilita websocketového spojenia.</li><li>Podpora dlhých textových formátov vrátane odrážok a zvýraznenia.</li><li>Okamžité fulltextové vyhľadávanie v celom archíve správ.</li></ol>",
-        createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
-        readTime: "2 min"
+        content: "<p>Vitajte na oficiálnom informačnom portáli <strong>GAMEPLA631 Info</strong>.</p><p>Portál slúži na zverejňovanie oznamov, dlhých textov a systémových hlásení v reálnom čase bez nutnosti registrácie pre čitateľov.</p>",
+        createdAt: new Date().toISOString(),
+        readTime: "1 min čítania"
       }
     ];
 
-    /* ================= INITIALIZATION ================= */
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-      // Initialize Rich Text Editor (Quill)
+      // Quill Editor Init
       state.quill = new Quill('#quillEditor', {
         theme: 'snow',
-        placeholder: 'Napíšte celý text oznamu sem... (môžete formátovať písmo, tvoriť zoznamy, citácie...)',
+        placeholder: 'Sem napíšte obsah správy...',
         modules: {
           toolbar: [
             [{ 'header': [1, 2, 3, false] }],
@@ -450,18 +413,14 @@
         }
       });
 
-      // Check stored admin session
       if (sessionStorage.getItem(CONFIG.AUTH_KEY) === 'true') {
         enableAdminMode(false);
       }
 
-      // Load cached local articles first for instant render
       loadLocalCache();
-
-      // Connect to MQTT Broker
       initMQTT();
 
-      // Keyboard Shortcut (Ctrl + Shift + A or Cmd + Shift + A)
+      // Keyboard shortcut Ctrl + Shift + A
       window.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
           e.preventDefault();
@@ -470,17 +429,17 @@
       });
     });
 
-    /* ================= LOCAL STORAGE CACHE ================= */
+    /* ================= STORAGE ================= */
     function loadLocalCache() {
       const cached = localStorage.getItem(CONFIG.STORAGE_KEY);
       if (cached) {
         try {
           state.articles = JSON.parse(cached);
-        } catch (e) {
-          state.articles = INITIAL_DEMO_DATA;
+        } catch(e) {
+          state.articles = INITIAL_DEMO;
         }
       } else {
-        state.articles = INITIAL_DEMO_DATA;
+        state.articles = INITIAL_DEMO;
       }
       render();
     }
@@ -489,94 +448,79 @@
       localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state.articles));
     }
 
-    /* ================= MQTT SYNCHRONIZATION (EMQX) ================= */
+    /* ================= MQTT OVER WSS ================= */
     function initMQTT() {
       updateStatusBadge('connecting');
-      const clientId = "client_gamepla631_" + Math.random().toString(16).substring(2, 10);
-      
-      try {
-        state.mqttClient = new Paho.MQTT.Client("broker.emqx.io", 8084, "/mqtt", clientId);
+      const clientId = "gp631_" + Math.random().toString(36).substring(2, 11);
 
+      try {
+        state.mqttClient = new Paho.MQTT.Client(CONFIG.MQTT_HOST, CONFIG.MQTT_PORT, CONFIG.MQTT_PATH, clientId);
         state.mqttClient.onConnectionLost = onConnectionLost;
         state.mqttClient.onMessageArrived = onMessageArrived;
 
-        const connectOptions = {
-          useSSL: true,
-          timeout: 5,
+        state.mqttClient.connect({
+          useSSL: true, // Povinné pre HTTPS / GitHub Pages
+          timeout: 6,
           keepAliveInterval: 30,
           cleanSession: true,
-          onSuccess: onConnectSuccess,
-          onFailure: onConnectFailure
-        };
-
-        state.mqttClient.connect(connectOptions);
-      } catch (err) {
-        console.error("MQTT Init Error:", err);
+          onSuccess: () => {
+            updateStatusBadge('connected');
+            state.mqttClient.subscribe(CONFIG.MQTT_TOPIC, { qos: 1 });
+          },
+          onFailure: (err) => {
+            console.warn("MQTT spojenie zlyhalo, prepínam do offline vyrovnávacej pamäte:", err);
+            updateStatusBadge('offline');
+            setTimeout(initMQTT, 7000);
+          }
+        });
+      } catch (e) {
         updateStatusBadge('offline');
       }
     }
 
-    function onConnectSuccess() {
-      updateStatusBadge('connected');
-      // Subscribe to topic
-      state.mqttClient.subscribe(CONFIG.MQTT_TOPIC, { qos: 1 });
-    }
-
-    function onConnectFailure(err) {
-      console.warn("MQTT Connection Failed:", err);
-      updateStatusBadge('offline');
-      // Reconnect after 6 seconds
-      setTimeout(initMQTT, 6000);
-    }
-
-    function onConnectionLost(responseObject) {
-      if (responseObject.errorCode !== 0) {
-        console.warn("MQTT Connection Lost:", responseObject.errorMessage);
+    function onConnectionLost(res) {
+      if (res.errorCode !== 0) {
         updateStatusBadge('offline');
         setTimeout(initMQTT, 5000);
       }
     }
 
-    function onMessageArrived(message) {
+    function onMessageArrived(msg) {
       try {
-        const payload = JSON.parse(message.payloadString);
+        const payload = JSON.parse(msg.payloadString);
         if (Array.isArray(payload)) {
           state.articles = payload;
           saveLocalCache();
           render();
-          showToast("Synchronizované s cloudom", "success");
+          showToast("Dáta synchronizované s cloudom", "success");
         }
-      } catch (err) {
-        console.error("Chyba spracovania MQTT správy:", err);
+      } catch(e) {
+        console.error("Chyba spracovania správy:", e);
       }
     }
 
     function publishArticlesToMQTT() {
+      saveLocalCache();
+      render();
+
       if (!state.mqttClient || !state.mqttClient.isConnected()) {
-        showToast("Nie ste pripojený k serveru! Zmeny uložené len lokálne.", "error");
-        saveLocalCache();
-        render();
+        showToast("Zmeny uložené lokálne (server je momentálne nedostupný)", "info");
         return;
       }
 
       try {
-        const payloadStr = JSON.stringify(state.articles);
-        const message = new Paho.MQTT.Message(payloadStr);
-        message.destinationName = CONFIG.MQTT_TOPIC;
-        message.retained = true; // RETAINED = natrvalo uložené na serveri pre všetkých nových čitateľov
-        message.qos = 1;
-        state.mqttClient.send(message);
-
-        saveLocalCache();
-        render();
-        showToast("Oznam bol úspešne publikovaný pre celý svet!", "success");
+        const msg = new Paho.MQTT.Message(JSON.stringify(state.articles));
+        msg.destinationName = CONFIG.MQTT_TOPIC;
+        msg.retained = true; // Zabezpečí trvalé uloženie
+        msg.qos = 1;
+        state.mqttClient.send(msg);
+        showToast("Oznam publikovaný pre celý svet!", "success");
       } catch (err) {
         console.error("Chyba publikovania:", err);
-        showToast("Chyba pri publikovaní do cloudu.", "error");
       }
     }
 
-    /* ================= STATUS UI ================= */
+    /* ================= UI STATUS ================= */
     function updateStatusBadge(status) {
       const badge = document.getElementById('statusBadge');
       const dot = document.getElementById('statusDot');
@@ -585,7 +529,7 @@
       badge.classList.remove('hidden');
       if (status === 'connected') {
         dot.className = "w-2 h-2 rounded-full bg-emerald-400";
-        text.textContent = "Live Cloud Spojenie";
+        text.textContent = "Live Cloud";
         badge.className = "hidden sm:flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-emerald-950/40 border border-emerald-800/60 text-emerald-400";
       } else if (status === 'connecting') {
         dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping";
@@ -593,16 +537,15 @@
         badge.className = "hidden sm:flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-amber-950/40 border border-amber-800/60 text-amber-400";
       } else {
         dot.className = "w-2 h-2 rounded-full bg-rose-500";
-        text.textContent = "Offline (Záloha)";
+        text.textContent = "Offline Záloha";
         badge.className = "hidden sm:flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-rose-950/40 border border-rose-800/60 text-rose-400";
       }
     }
 
-    /* ================= ADMIN AUTHENTICATION ================= */
+    /* ================= ADMIN ================= */
     function handleAdminButtonClick() {
       if (state.isAdmin) {
-        // Ak už je admin, kliknutím sa odhlási
-        if (confirm("Chcete sa odhlásiť z Administrátorského režimu?")) {
+        if (confirm("Chcete sa odhlásiť z Admin režimu?")) {
           disableAdminMode();
         }
       } else {
@@ -623,28 +566,24 @@
 
     function handlePinSubmit(e) {
       e.preventDefault();
-      const enteredPin = document.getElementById('adminPinInput').value.trim();
-      if (enteredPin === CONFIG.ADMIN_PIN) {
+      const val = document.getElementById('adminPinInput').value.trim();
+      if (val === CONFIG.ADMIN_PIN) {
         sessionStorage.setItem(CONFIG.AUTH_KEY, 'true');
         enableAdminMode(true);
         closePinModal();
       } else {
         document.getElementById('pinError').classList.remove('hidden');
-        document.getElementById('adminPinInput').value = '';
       }
     }
 
-    function enableAdminMode(showNotify = true) {
+    function enableAdminMode(toast = true) {
       state.isAdmin = true;
       document.getElementById('btnNewPost').classList.remove('hidden');
       document.getElementById('btnNewPost').classList.add('flex');
       document.getElementById('adminIndicator').classList.remove('hidden');
       document.getElementById('adminIndicator').classList.add('flex');
-      
-      const lockIcon = document.getElementById('lockIcon');
-      lockIcon.className = "fa-solid fa-lock-open text-emerald-400";
-      
-      if (showNotify) showToast("Admin režim aktivovaný", "success");
+      document.getElementById('lockIcon').className = "fa-solid fa-lock-open text-emerald-400";
+      if (toast) showToast("Admin režim aktivovaný", "success");
       render();
     }
 
@@ -655,29 +594,26 @@
       document.getElementById('btnNewPost').classList.remove('flex');
       document.getElementById('adminIndicator').classList.add('hidden');
       document.getElementById('adminIndicator').classList.remove('flex');
-
-      const lockIcon = document.getElementById('lockIcon');
-      lockIcon.className = "fa-solid fa-lock text-slate-400";
-
-      showToast("Boli ste odhlásený z Admin režimu", "info");
+      document.getElementById('lockIcon').className = "fa-solid fa-lock text-slate-400";
+      showToast("Boli ste odhlásený", "info");
       render();
     }
 
-    /* ================= CRUD & POST EDITOR ================= */
+    /* ================= CRUD ================= */
     function openPostModal(editId = null) {
       const modal = document.getElementById('postModal');
       const modalTitle = document.getElementById('modalTitle');
       const submitBtn = document.getElementById('btnSubmitPost');
 
       if (editId) {
-        const article = state.articles.find(a => a.id === editId);
-        if (!article) return;
-        document.getElementById('editArticleId').value = article.id;
-        document.getElementById('postTitle').value = article.title;
-        document.getElementById('postCategory').value = article.category;
-        document.getElementById('postPinned').checked = !!article.pinned;
-        state.quill.root.innerHTML = article.content;
-        modalTitle.textContent = "Upraviť oznam / článok";
+        const item = state.articles.find(a => a.id === editId);
+        if (!item) return;
+        document.getElementById('editArticleId').value = item.id;
+        document.getElementById('postTitle').value = item.title;
+        document.getElementById('postCategory').value = item.category;
+        document.getElementById('postPinned').checked = !!item.pinned;
+        state.quill.root.innerHTML = item.content;
+        modalTitle.textContent = "Upraviť oznam";
         submitBtn.innerHTML = '<i class="fa-solid fa-check"></i><span>Uložiť zmeny</span>';
       } else {
         document.getElementById('editArticleId').value = "";
@@ -685,10 +621,9 @@
         document.getElementById('postCategory').value = "urgent";
         document.getElementById('postPinned').checked = false;
         state.quill.root.innerHTML = "";
-        modalTitle.textContent = "Nový oznam / článok";
+        modalTitle.textContent = "Nový oznam";
         submitBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i><span>Zverejniť pre všetkých</span>';
       }
-
       modal.classList.remove('hidden');
     }
 
@@ -706,16 +641,14 @@
       const textOnly = state.quill.getText().trim();
 
       if (!title || !textOnly) {
-        alert("Prosím vyplňte názov aj text oznamu.");
+        alert("Vyplňte prosím názov aj obsah.");
         return;
       }
 
-      // Calculate reading time
       const words = textOnly.split(/\s+/).length;
       const readTime = Math.max(1, Math.ceil(words / 180)) + " min čítania";
 
       if (editId) {
-        // Edit existing
         state.articles = state.articles.map(a => {
           if (a.id === editId) {
             return { ...a, title, category, pinned, content, readTime, updatedAt: new Date().toISOString() };
@@ -723,9 +656,8 @@
           return a;
         });
       } else {
-        // Create new
-        const newArticle = {
-          id: "post_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
+        const newItem = {
+          id: "art_" + Date.now(),
           title,
           category,
           pinned,
@@ -733,7 +665,7 @@
           createdAt: new Date().toISOString(),
           readTime
         };
-        state.articles.unshift(newArticle);
+        state.articles.unshift(newItem);
       }
 
       closePostModal();
@@ -741,115 +673,82 @@
     }
 
     function deleteArticle(id) {
-      if (!confirm("Naozaj chcete natrvalo vymazať tento oznam pre všetkých návštevníkov?")) return;
+      if (!confirm("Naozaj vymazať tento oznam?")) return;
       state.articles = state.articles.filter(a => a.id !== id);
       publishArticlesToMQTT();
     }
 
-    /* ================= FILTERS & SEARCH ================= */
-    function setFilter(category) {
-      state.filter = category;
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        if (btn.dataset.filter === category) {
-          btn.className = "filter-btn active px-3.5 py-2 rounded-xl font-medium bg-brand-600 text-white transition";
+    /* ================= FILTERS & RENDERING ================= */
+    function setFilter(cat) {
+      state.filter = cat;
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        if (b.dataset.filter === cat) {
+          b.className = "filter-btn active px-3.5 py-2 rounded-xl font-medium bg-brand-600 text-white transition";
         } else {
-          btn.className = "filter-btn px-3.5 py-2 rounded-xl font-medium bg-slate-800/70 text-slate-300 hover:bg-slate-700 hover:text-white transition";
+          b.className = "filter-btn px-3.5 py-2 rounded-xl font-medium bg-slate-800/70 text-slate-300 hover:bg-slate-700 hover:text-white transition";
         }
       });
-
-      const titles = {
-        all: "Všetky publikované oznamy",
-        urgent: "Dôležité a bezpečnostné upozornenia",
-        notice: "Systémové oznamy",
-        update: "Aktualizácie a zmeny",
-        news: "Správy a informačné články"
-      };
-      document.getElementById('feedTitle').textContent = titles[category] || "Oznamy";
       render();
     }
 
-    function handleSearch(query) {
-      state.searchQuery = query.toLowerCase().trim();
+    function handleSearch(val) {
+      state.searchQuery = val.toLowerCase().trim();
       render();
     }
 
-    /* ================= UI RENDERING ================= */
-    function getCategoryBadge(cat) {
+    function getBadge(cat) {
       switch (cat) {
-        case 'urgent':
-          return `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> Upozornenie</span>`;
-        case 'notice':
-          return `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1.5"><i class="fa-solid fa-bullhorn"></i> Oznam</span>`;
-        case 'update':
-          return `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1.5"><i class="fa-solid fa-arrows-rotate"></i> Aktualizácia</span>`;
-        default:
-          return `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1.5"><i class="fa-solid fa-newspaper"></i> Správa</span>`;
+        case 'urgent': return `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> Upozornenie</span>`;
+        case 'notice': return `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1.5"><i class="fa-solid fa-bullhorn"></i> Oznam</span>`;
+        case 'update': return `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1.5"><i class="fa-solid fa-arrows-rotate"></i> Aktualizácia</span>`;
+        default: return `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1.5"><i class="fa-solid fa-newspaper"></i> Správa</span>`;
       }
     }
 
-    function formatDate(isoString) {
+    function formatDate(str) {
       try {
-        const d = new Date(isoString);
-        return d.toLocaleDateString('sk-SK', {
+        return new Date(str).toLocaleDateString('sk-SK', {
           day: 'numeric',
           month: 'long',
           year: 'numeric',
           hour: '2-digit',
           minute: '2-digit'
         });
-      } catch (e) {
-        return "Nedávno";
-      }
+      } catch(e) { return "Dnes"; }
     }
 
-    function updateCounters() {
-      const counts = { all: state.articles.length, urgent: 0, notice: 0, update: 0, news: 0 };
-      state.articles.forEach(a => { if (counts[a.category] !== undefined) counts[a.category]++; });
-      
-      document.getElementById('count-all').textContent = counts.all;
-      document.getElementById('count-urgent').textContent = counts.urgent;
-      document.getElementById('count-notice').textContent = counts.notice;
-      document.getElementById('count-update').textContent = counts.update;
-      document.getElementById('count-news').textContent = counts.news;
-    }
-
-    function renderHeroBanner(pinnedArticle) {
+    function renderHero(pinned) {
       const hero = document.getElementById('urgentHero');
-      if (!pinnedArticle) {
+      if (!pinned) {
         hero.innerHTML = '';
         hero.classList.add('hidden');
         return;
       }
-
       hero.classList.remove('hidden');
-      const isUrgent = pinnedArticle.category === 'urgent';
-      const bgBorder = isUrgent ? 'border-red-500/40 bg-gradient-to-r from-red-950/40 via-slate-900 to-slate-900' : 'border-brand-500/40 bg-gradient-to-r from-brand-950/40 via-slate-900 to-slate-900';
-      const iconColor = isUrgent ? 'text-red-400' : 'text-brand-400';
-
       hero.innerHTML = `
-        <div class="glass-panel p-6 sm:p-7 rounded-3xl border ${bgBorder} relative overflow-hidden shadow-2xl">
+        <div class="glass-panel p-6 sm:p-7 rounded-3xl border border-brand-500/40 bg-gradient-to-r from-brand-950/40 via-slate-900 to-slate-900 relative shadow-2xl">
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
             <div class="flex items-center gap-2">
               <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-500/20 text-red-300 border border-red-500/30 animate-pulse">
-                <i class="fa-solid fa-thumbtack mr-1"></i> Dôležité / Pripnuté
+                <i class="fa-solid fa-thumbtack mr-1"></i> Pripnuté
               </span>
-              ${getCategoryBadge(pinnedArticle.category)}
+              ${getBadge(pinned.category)}
             </div>
             <div class="text-xs text-slate-400 flex items-center gap-3 font-medium">
-              <span><i class="fa-regular fa-calendar mr-1"></i> ${formatDate(pinnedArticle.createdAt)}</span>
-              <span><i class="fa-regular fa-clock mr-1"></i> ${pinnedArticle.readTime || '1 min'}</span>
+              <span><i class="fa-regular fa-calendar mr-1"></i> ${formatDate(pinned.createdAt)}</span>
+              <span><i class="fa-regular fa-clock mr-1"></i> ${pinned.readTime || '1 min'}</span>
             </div>
           </div>
-          <h1 class="text-xl sm:text-2xl font-black text-white mb-3 leading-tight tracking-tight">${pinnedArticle.title}</h1>
+          <h1 class="text-xl sm:text-2xl font-black text-white mb-3 tracking-tight">${pinned.title}</h1>
           <div class="article-content text-slate-300 text-sm sm:text-base mb-4 max-h-60 overflow-y-auto pr-2">
-            ${pinnedArticle.content}
+            ${pinned.content}
           </div>
           ${state.isAdmin ? `
             <div class="pt-3 border-t border-white/10 flex justify-end gap-2">
-              <button onclick="openPostModal('${pinnedArticle.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white border border-slate-700">
+              <button onclick="openPostModal('${pinned.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white border border-slate-700">
                 <i class="fa-solid fa-pen-to-square mr-1"></i> Upraviť
               </button>
-              <button onclick="deleteArticle('${pinnedArticle.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-950/60 text-red-400 hover:text-red-300 border border-red-800/50">
+              <button onclick="deleteArticle('${pinned.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-950/60 text-red-400 hover:text-red-300 border border-red-800/50">
                 <i class="fa-solid fa-trash-can mr-1"></i> Vymazať
               </button>
             </div>
@@ -859,19 +758,22 @@
     }
 
     function render() {
-      updateCounters();
+      // Counters
+      const counts = { all: state.articles.length, urgent: 0, notice: 0, update: 0, news: 0 };
+      state.articles.forEach(a => { if (counts[a.category] !== undefined) counts[a.category]++; });
+      document.getElementById('count-all').textContent = counts.all;
+      document.getElementById('count-urgent').textContent = counts.urgent;
+      document.getElementById('count-notice').textContent = counts.notice;
+      document.getElementById('count-update').textContent = counts.update;
+      document.getElementById('count-news').textContent = counts.news;
 
-      // Find top pinned article for Hero
+      // Pinned Hero
       const pinned = state.articles.find(a => a.pinned);
-      renderHeroBanner(pinned);
+      renderHero(pinned);
 
-      // Filter articles
+      // Filter & Search
       let filtered = [...state.articles];
-
-      if (state.filter !== 'all') {
-        filtered = filtered.filter(a => a.category === state.filter);
-      }
-
+      if (state.filter !== 'all') filtered = filtered.filter(a => a.category === state.filter);
       if (state.searchQuery) {
         filtered = filtered.filter(a => 
           a.title.toLowerCase().includes(state.searchQuery) || 
@@ -879,50 +781,38 @@
         );
       }
 
-      document.getElementById('filteredCountText').textContent = `Zobrazených ${filtered.length} z ${state.articles.length} oznamov`;
+      document.getElementById('filteredCountText').textContent = `Zobrazených ${filtered.length} z ${state.articles.length}`;
 
-      const listContainer = document.getElementById('articlesList');
-      const emptyState = document.getElementById('emptyState');
+      const list = document.getElementById('articlesList');
+      const empty = document.getElementById('emptyState');
 
       if (filtered.length === 0) {
-        listContainer.innerHTML = '';
-        emptyState.classList.remove('hidden');
+        list.innerHTML = '';
+        empty.classList.remove('hidden');
         return;
       }
+      empty.classList.add('hidden');
 
-      emptyState.classList.add('hidden');
-
-      listContainer.innerHTML = filtered.map(article => `
-        <article class="glass-panel p-6 sm:p-7 rounded-2xl border border-white/5 hover:border-slate-700 transition duration-200 relative group shadow-lg">
-          <!-- Top Row -->
+      list.innerHTML = filtered.map(a => `
+        <article class="glass-panel p-6 sm:p-7 rounded-2xl border border-white/5 hover:border-slate-700 transition relative shadow-lg">
           <div class="flex flex-wrap items-center justify-between gap-3 mb-3.5">
             <div class="flex items-center gap-2">
-              ${getCategoryBadge(article.category)}
-              ${article.pinned ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-brand-500/20 text-brand-300 border border-brand-500/30">Pripnuté</span>` : ''}
+              ${getBadge(a.category)}
+              ${a.pinned ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-brand-500/20 text-brand-300 border border-brand-500/30">Pripnuté</span>` : ''}
             </div>
             <div class="flex items-center gap-3 text-xs text-slate-400 font-medium">
-              <span><i class="fa-regular fa-calendar mr-1"></i> ${formatDate(article.createdAt)}</span>
-              <span><i class="fa-regular fa-clock mr-1"></i> ${article.readTime || '2 min'}</span>
+              <span><i class="fa-regular fa-calendar mr-1"></i> ${formatDate(a.createdAt)}</span>
+              <span><i class="fa-regular fa-clock mr-1"></i> ${a.readTime || '1 min'}</span>
             </div>
           </div>
-
-          <!-- Title -->
-          <h3 class="text-lg sm:text-xl font-bold text-white mb-3 group-hover:text-brand-300 transition-colors tracking-tight">
-            ${article.title}
-          </h3>
-
-          <!-- Full Content -->
-          <div class="article-content text-slate-300 text-sm sm:text-base">
-            ${article.content}
-          </div>
-
-          <!-- Admin Actions (Only in admin mode) -->
+          <h3 class="text-lg sm:text-xl font-bold text-white mb-3 tracking-tight">${a.title}</h3>
+          <div class="article-content text-slate-300 text-sm sm:text-base">${a.content}</div>
           ${state.isAdmin ? `
             <div class="mt-5 pt-3.5 border-t border-slate-800/80 flex items-center justify-end gap-2">
-              <button onclick="openPostModal('${article.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+              <button onclick="openPostModal('${a.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
                 <i class="fa-solid fa-pen-to-square"></i> Upraviť
               </button>
-              <button onclick="deleteArticle('${article.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-950/50 hover:bg-red-900/60 text-red-300 border border-red-800/40 transition flex items-center gap-1.5">
+              <button onclick="deleteArticle('${a.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-950/50 hover:bg-red-900/60 text-red-300 border border-red-800/40 transition flex items-center gap-1.5">
                 <i class="fa-solid fa-trash-can"></i> Vymazať
               </button>
             </div>
@@ -931,30 +821,21 @@
       `).join('');
     }
 
-    /* ================= TOAST HELPER ================= */
-    let toastTimeout;
-    function showToast(message, type = 'success') {
+    /* ================= TOAST ================= */
+    let tTimer;
+    function showToast(msg, type = 'success') {
       const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toastMsg');
-      const toastIcon = document.getElementById('toastIcon');
-
-      toastMsg.textContent = message;
-      if (type === 'success') {
-        toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
-      } else if (type === 'error') {
-        toastIcon.className = "fa-solid fa-circle-xmark text-rose-400";
-      } else {
-        toastIcon.className = "fa-solid fa-circle-info text-blue-400";
-      }
-
+      document.getElementById('toastMsg').textContent = msg;
+      const icon = document.getElementById('toastIcon');
+      icon.className = type === 'success' ? "fa-solid fa-circle-check text-emerald-400" : "fa-solid fa-circle-info text-blue-400";
+      
       toast.classList.remove('translate-y-20', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
-
-      clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
+      clearTimeout(tTimer);
+      tTimer = setTimeout(() => {
         toast.classList.add('translate-y-20', 'opacity-0');
         toast.classList.remove('translate-y-0', 'opacity-100');
-      }, 3500);
+      }, 3000);
     }
   </script>
 </body>
