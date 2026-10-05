@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FaceDanker // Cyber-Media Network</title>
+    <title>FaceDanker // Global Media Network</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Ikony -->
@@ -63,11 +63,11 @@
     <header class="glass-panel sticky top-0 z-50 px-4 lg:px-8 py-3 flex justify-between items-center border-b border-cyan-500/20">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('feed')">
             <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-cyan-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                <i class="fa-solid fa-bolt text-white text-xl animate-pulse"></i>
+                <i class="fa-solid fa-globe text-white text-xl animate-pulse"></i>
             </div>
             <div>
                 <span class="orbitron text-2xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-purple-300 to-pink-500">FaceDanker</span>
-                <span class="hidden md:inline-block text-[10px] text-cyan-400/70 orbitron ml-2 border border-cyan-500/30 px-1.5 py-0.5 rounded">DIRECT UPLOAD</span>
+                <span class="hidden md:inline-block text-[10px] text-cyan-400/70 orbitron ml-2 border border-cyan-500/30 px-1.5 py-0.5 rounded">VEREJNÁ SIEŤ</span>
             </div>
         </div>
 
@@ -88,14 +88,14 @@
     <!-- HLAVNÝ GRID -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-        <!-- ĽAVÝ PANEL: PROFIL & ODPORÚČACÍ ALGORITMUS -->
+        <!-- ĽAVÝ PANEL -->
         <aside class="lg:col-span-1 space-y-6">
             <div id="user-quick-card" class="glass-panel p-5 rounded-2xl text-center relative overflow-hidden"></div>
 
             <nav class="glass-panel p-3 rounded-2xl space-y-1 font-semibold text-sm">
                 <button onclick="showSection('feed')" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl hover:bg-cyan-500/10 hover:text-cyan-400 transition text-left">
-                    <i class="fa-solid fa-layer-group text-base"></i>
-                    <span>Media Stream</span>
+                    <i class="fa-solid fa-earth-americas text-base"></i>
+                    <span>Verejný Stream</span>
                 </button>
                 <button onclick="showSection('profile')" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl hover:bg-cyan-500/10 hover:text-cyan-400 transition text-left">
                     <i class="fa-solid fa-id-badge text-base"></i>
@@ -119,63 +119,63 @@
             </div>
         </aside>
 
-        <!-- STREDNÝ PANEL: STREAM / PROFIL / ADMIN -->
+        <!-- STREDNÝ PANEL -->
         <section class="lg:col-span-3 space-y-6">
 
             <!-- 1. FEED SEKCIA -->
             <div id="sec-feed" class="space-y-6">
-                <!-- Vytvorenie príspevku s priamym nahrávaním -->
+                
+                <!-- ZVEREJNENIE PRÍSPEVKU -->
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
                     <div class="flex justify-between items-center">
                         <span class="orbitron text-xs font-bold text-cyan-400 flex items-center gap-2">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Nahrať Médium zo Zariadenia
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Zverejniť Obrázok / Hudbu na Verejnú Sieť
                         </span>
-                        <span class="text-[10px] text-pink-400 bg-pink-500/10 px-2 py-0.5 rounded border border-pink-500/20">Chat Vypnutý</span>
+                        <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Viditeľné pre všetkých</span>
                     </div>
 
-                    <input id="post-title" type="text" placeholder="Napíš popis alebo názov k médiu..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-cyan-400">
+                    <input id="post-title" type="text" placeholder="Napíš popis k médiu..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-cyan-400">
 
-                    <!-- DROPZONE / TLAČIDLÁ NA VÝBER SÚBOROV -->
+                    <!-- VÝBER SÚBOROV -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        
-                        <!-- Výber Obrázka zo zariadenia -->
                         <div class="file-upload-box rounded-xl p-3 text-center cursor-pointer relative flex flex-col items-center justify-center bg-slate-900/50" onclick="document.getElementById('post-img-file').click()">
                             <input type="file" id="post-img-file" accept="image/*" class="hidden" onchange="handleImageSelection(event)">
                             <i class="fa-solid fa-image text-2xl text-cyan-400 mb-1"></i>
-                            <span id="img-upload-status" class="text-xs font-bold text-slate-300">Vybrať Obrázok zo zariadenia</span>
-                            <span class="text-[10px] text-slate-500">JPG, PNG, GIF, WEBP</span>
+                            <span id="img-upload-status" class="text-xs font-bold text-slate-300">Vybrať fotku zo zariadenia</span>
+                            <span class="text-[10px] text-slate-500">JPG, PNG, WEBP (Auto-Optimalizácia)</span>
                         </div>
 
-                        <!-- Výber Zvuku / MP3 zo zariadenia -->
                         <div class="file-upload-box rounded-xl p-3 text-center cursor-pointer relative flex flex-col items-center justify-center bg-slate-900/50" onclick="document.getElementById('post-audio-file').click()">
                             <input type="file" id="post-audio-file" accept="audio/*" class="hidden" onchange="handleAudioSelection(event)">
                             <i class="fa-solid fa-file-audio text-2xl text-purple-400 mb-1"></i>
-                            <span id="audio-upload-status" class="text-xs font-bold text-slate-300">Vybrať MP3 / Hudbu zo zariadenia</span>
-                            <span class="text-[10px] text-slate-500">MP3, WAV, OGG</span>
+                            <span id="audio-upload-status" class="text-xs font-bold text-slate-300">Vybrať MP3 zo zariadenia</span>
+                            <span class="text-[10px] text-slate-500">Alebo zadaj MP3 URL nižšie</span>
                         </div>
                     </div>
 
-                    <!-- Náhľad vybraného obrázka pred publikovaním -->
+                    <input id="post-audio-url" type="text" placeholder="Alebo vlož priamu URL adresu na MP3 (https://...mp3)" class="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-1.5 text-xs focus:outline-none focus:border-purple-400">
+
+                    <!-- Náhľad vybraného obrázka -->
                     <div id="image-preview-box" class="hidden relative rounded-xl overflow-hidden max-h-48 border border-cyan-500/40 bg-black flex items-center justify-center">
                         <img id="image-preview-elem" src="" alt="Náhľad" class="max-h-48 object-contain">
                         <button onclick="clearSelectedImage()" class="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg hover:bg-red-500">✕</button>
                     </div>
 
                     <div class="flex justify-between items-center pt-2">
-                        <span class="text-[11px] text-slate-400"><i class="fa-solid fa-shield-halved text-cyan-400"></i> DMCA chránené</span>
-                        <button onclick="publishPost()" class="orbitron bg-gradient-to-r from-cyan-500 to-purple-600 hover:opacity-90 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-cyan-500/20">
-                            Zverejniť na Sieť
+                        <span class="text-[11px] text-slate-400"><i class="fa-solid fa-shield-halved text-cyan-400"></i> DMCA Global Sync</span>
+                        <button id="btn-publish" onclick="publishPost()" class="orbitron bg-gradient-to-r from-cyan-500 to-purple-600 hover:opacity-90 text-slate-950 font-bold px-7 py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-cyan-500/20">
+                            Zverejniť Teraz
                         </button>
                     </div>
                 </div>
 
-                <!-- Zoznam príspevkov -->
+                <!-- ZOZNAM VEREJNÝCH PRÍSPEVKOV -->
                 <div id="posts-container" class="space-y-6"></div>
             </div>
 
             <!-- 2. PROFIL SEKCIA -->
             <div id="sec-profile" class="hidden glass-panel p-6 rounded-2xl space-y-6">
-                <div class="flex justify-between items-center border-b border-cyan-500/20 pb-4">
+                <div class="flex justify-between items-center border-b border-cyan-500/20 pb-4 flex-wrap gap-3">
                     <div>
                         <h2 class="orbitron text-2xl font-bold text-white flex items-center gap-2">
                             <span id="prof-name">Užívateľ</span>
@@ -198,8 +198,8 @@
                         <input id="prof-living" type="text" class="w-full bg-transparent border-b border-slate-700 py-1.5 text-sm focus:outline-none focus:border-cyan-400" placeholder="Kde žijem teraz">
                     </div>
                     <div class="md:col-span-2 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-                        <label class="text-xs text-cyan-400 orbitron">Záujmy / Čo mám rád (pre AI Algoritmus)</label>
-                        <textarea id="prof-likes" rows="2" class="w-full bg-transparent border-b border-slate-700 py-1.5 text-sm focus:outline-none focus:border-cyan-400" placeholder="Napr. Synthwave, Fotografia, 3D Umenie, Cyberpunk..."></textarea>
+                        <label class="text-xs text-cyan-400 orbitron">Záujmy / Čo mám rád (pre AI Odporúčania)</label>
+                        <textarea id="prof-likes" rows="2" class="w-full bg-transparent border-b border-slate-700 py-1.5 text-sm focus:outline-none focus:border-cyan-400" placeholder="Napr. Fotografia, Hudba, Synthwave, Cyberpunk..."></textarea>
                     </div>
                 </div>
 
@@ -208,7 +208,7 @@
                 </button>
             </div>
 
-            <!-- 3. ADMIN PANEL (GOD-MODE) -->
+            <!-- 3. ADMIN PANEL -->
             <div id="sec-admin" class="hidden space-y-6">
                 <div class="glass-panel-admin p-6 rounded-2xl space-y-6">
                     <div class="flex items-center justify-between border-b border-pink-500/30 pb-4">
@@ -229,7 +229,7 @@
                         <div id="admin-verify-list" class="space-y-2"></div>
                     </div>
 
-                    <!-- Kompletná Správa Používateľov -->
+                    <!-- Správa Používateľov -->
                     <div class="space-y-3">
                         <h3 class="orbitron text-xs font-bold text-pink-400 flex items-center gap-2">
                             <i class="fa-solid fa-users-gear"></i> Databáza a Úprava Používateľov
@@ -237,10 +237,10 @@
                         <div id="admin-users-table" class="space-y-3"></div>
                     </div>
 
-                    <!-- Moderácia Príspevkov a DMCA -->
+                    <!-- Moderácia Príspevkov -->
                     <div class="space-y-3">
                         <h3 class="orbitron text-xs font-bold text-purple-400 flex items-center gap-2">
-                            <i class="fa-solid fa-shield-cat"></i> Príspevky, Autorské Práva a Blokovanie
+                            <i class="fa-solid fa-shield-cat"></i> Verejné Príspevky a Autorské Práva
                         </h3>
                         <div id="admin-posts-list" class="space-y-2"></div>
                     </div>
@@ -269,15 +269,16 @@
     <!-- REGISTRÁCIA / PRIHLÁSENIE POUŽÍVATEĽA -->
     <div id="auth-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center hidden z-50 p-4">
         <div class="glass-panel max-w-md w-full p-6 rounded-2xl border border-cyan-500/40 space-y-4">
-            <h3 class="orbitron text-xl font-bold text-cyan-400 text-center">FaceDanker ID Sign-In</h3>
+            <h3 class="orbitron text-xl font-bold text-cyan-400 text-center">Vytvoriť FaceDanker Profil</h3>
+            <p class="text-xs text-slate-400 text-center">Zadaj meno a začni zverejňovať médiá pre celý svet.</p>
             
             <div>
-                <label class="text-xs text-slate-400">Meno / Cyber Pseudonym</label>
-                <input id="auth-username" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-cyan-400 focus:outline-none mt-1">
+                <label class="text-xs text-slate-400">Meno / Cyber Nick</label>
+                <input id="auth-username" type="text" placeholder="Napr. CyberDan" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-cyan-400 focus:outline-none mt-1">
             </div>
             <div>
-                <label class="text-xs text-slate-400">Emailový Identifikátor</label>
-                <input id="auth-email" type="email" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-cyan-400 focus:outline-none mt-1">
+                <label class="text-xs text-slate-400">Email</label>
+                <input id="auth-email" type="email" placeholder="tvoj@email.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-cyan-400 focus:outline-none mt-1">
             </div>
             
             <button onclick="handleUserAuth()" class="w-full orbitron bg-gradient-to-r from-cyan-500 to-purple-600 text-slate-950 font-bold py-2.5 rounded-xl uppercase tracking-wider text-xs transition">
@@ -286,43 +287,49 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT: NAHRÁVANIE SÚBOROV, LOGIKA, MQTT -->
+    <!-- JAVASCRIPT: SPOĽAHLIVÁ LOGIKA & MQTT VEREJNÝ FEED -->
     <script>
-        // MASTER ADMIN KĽÚČ
         const SECRET_ADMIN_KEY = "AQ#Admin_9842!CoreX";
 
-        // MQTT PARAMETRE
+        // VEREJNÝ MQTT BROKER & GLOBÁLNE KANÁLY
         const MQTT_BROKER = "broker.emqx.io";
         const MQTT_PORT = 8084;
         const MQTT_PATH = "/mqtt";
-        const CLIENT_ID = "FD_Node_" + Math.random().toString(16).substr(2, 8);
+        const CLIENT_ID = "FD_Public_" + Math.random().toString(16).substr(2, 8);
+        const MQTT_FEED_TOPIC = "facedanker/v3/global_feed";
+        const MQTT_USERS_TOPIC = "facedanker/v3/global_users";
 
         let client;
         let isSuperAdmin = sessionStorage.getItem('fd_is_admin') === 'true';
 
-        // Dočasné uloženie vybratých súborov (Base64)
         let selectedImageData = null;
         let selectedAudioData = null;
 
-        // Globálne Úložisko
+        // Lokálne úložisko
         let currentUser = JSON.parse(localStorage.getItem('fd_user')) || null;
         let posts = JSON.parse(localStorage.getItem('fd_posts')) || [];
-        let allUsers = JSON.parse(localStorage.getItem('fd_all_users')) || [
-            { name: "NeoPulse", email: "neopulse@matrix.io", verified: true, birthplace: "Tokio", living: "Neo-Slovakia", likes: "Synthwave, Cyberpunk, AI" },
-            { name: "AuraStream", email: "aura@sound.net", verified: false, birthplace: "Košice", living: "Berlín", likes: "MP3, Basy, Elektronická hudba" }
-        ];
+        let allUsers = JSON.parse(localStorage.getItem('fd_all_users')) || [];
         let verifyRequests = JSON.parse(localStorage.getItem('fd_verify_reqs')) || [];
         let bannedUsers = JSON.parse(localStorage.getItem('fd_banned')) || [];
 
-        // Inicializácia
+        // Ak užívateľ nemá účet, vytvoríme dočasného hosťa aby mohol ihneď zverejňovať
+        if (!currentUser) {
+            currentUser = {
+                name: "CyberUser_" + Math.floor(1000 + Math.random() * 9000),
+                email: "user_" + Math.floor(1000 + Math.random() * 9000) + "@facedanker.io",
+                verified: false,
+                birthplace: "Slovensko",
+                living: "Global Web",
+                likes: "Obrázky, Hudba, Umenie"
+            };
+            localStorage.setItem('fd_user', JSON.stringify(currentUser));
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             initMQTT();
             updateUI();
             runRecommendationAlgorithm();
             renderPosts();
-            if (!currentUser) {
-                document.getElementById('auth-modal').classList.remove('hidden');
-            }
         });
 
         // Klávesová skratka pre admina: Ctrl + Alt + A
@@ -332,26 +339,23 @@
             }
         });
 
-        // ================= NAHRÁVANIE OBRÁZKOV A HUDBY ZO ZARIADENIA ================= //
+        // ================= AUTOMATICKÁ KOMPRESIA A VÝBER OBRÁZKA ================= //
         function handleImageSelection(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            if (!file.type.startsWith('image/')) {
-                alert("Prosím vyber platný obrázok!");
-                return;
-            }
+            document.getElementById('img-upload-status').innerText = "Optimalizujem fotku...";
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Optimalizácia a zmenšenie obrázku cez Canvas (aby nezahltil pamäť a MQTT)
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const maxDim = 1200; // Maximálne rozlíšenie
-
+                    
+                    // Bezpečné škálovanie pre okamžité zverejnenie cez sieť
+                    const maxDim = 800;
                     if (width > maxDim || height > maxDim) {
                         if (width > height) {
                             height = Math.round((height * maxDim) / width);
@@ -367,13 +371,12 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Skonvertuj na Base64
-                    selectedImageData = canvas.toDataURL('image/jpeg', 0.82);
+                    // Skomprimuj na ~40-70 KB JPEG
+                    selectedImageData = canvas.toDataURL('image/jpeg', 0.68);
 
-                    // Zobraz náhľad
                     document.getElementById('image-preview-elem').src = selectedImageData;
                     document.getElementById('image-preview-box').classList.remove('hidden');
-                    document.getElementById('img-upload-status').innerText = "✓ Obrázok pripravený (" + file.name + ")";
+                    document.getElementById('img-upload-status').innerText = "✓ Obrázok pripravený";
                     document.getElementById('img-upload-status').className = "text-xs font-bold text-cyan-400";
                 };
                 img.src = e.target.result;
@@ -386,7 +389,7 @@
             document.getElementById('post-img-file').value = "";
             document.getElementById('image-preview-box').classList.add('hidden');
             document.getElementById('image-preview-elem').src = "";
-            document.getElementById('img-upload-status').innerText = "Vybrať Obrázok zo zariadenia";
+            document.getElementById('img-upload-status').innerText = "Vybrať fotku zo zariadenia";
             document.getElementById('img-upload-status').className = "text-xs font-bold text-slate-300";
         }
 
@@ -394,77 +397,263 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            if (file.size > 12 * 1024 * 1024) {
-                alert("Zvukový súbor je príliš veľký! Maximum je 12MB.");
+            if (file.size > 8 * 1024 * 1024) {
+                alert("Zvukový súbor je príliš veľký (max 8MB)!");
                 return;
             }
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 selectedAudioData = e.target.result;
-                document.getElementById('audio-upload-status').innerText = "✓ Hudba vybratá (" + file.name + ")";
+                document.getElementById('audio-upload-status').innerText = "✓ MP3 pripravené";
                 document.getElementById('audio-upload-status').className = "text-xs font-bold text-purple-400";
             };
             reader.readAsDataURL(file);
         }
 
-        // ================= MQTT SYSTÉM ================= //
+        // ================= MQTT SYSTÉM (GLOBÁLNA SYNCHRONIZÁCIA) ================= //
         function initMQTT() {
             client = new Paho.MQTT.Client(MQTT_BROKER, Number(MQTT_PORT), MQTT_PATH, CLIENT_ID);
-            client.onConnectionLost = (res) => {
-                if (res.errorCode !== 0) setTimeout(initMQTT, 5000);
+            
+            client.onConnectionLost = () => {
+                const status = document.getElementById('mqtt-status');
+                status.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Znovupripájanie...`;
+                setTimeout(initMQTT, 3000);
             };
+
             client.onMessageArrived = (msg) => {
                 try {
                     const data = JSON.parse(msg.payloadString);
-                    if (msg.destinationName === "facedanker/feed/sync") {
-                        posts = data;
-                        localStorage.setItem('fd_posts', JSON.stringify(posts));
-                        renderPosts();
-                    } else if (msg.destinationName === "facedanker/network/users") {
-                        allUsers = data;
-                        localStorage.setItem('fd_all_users', JSON.stringify(allUsers));
-                        runRecommendationAlgorithm();
+                    if (msg.destinationName === MQTT_FEED_TOPIC) {
+                        if (Array.isArray(data)) {
+                            posts = data;
+                            localStorage.setItem('fd_posts', JSON.stringify(posts));
+                            renderPosts();
+                        }
+                    } else if (msg.destinationName === MQTT_USERS_TOPIC) {
+                        if (Array.isArray(data)) {
+                            allUsers = data;
+                            localStorage.setItem('fd_all_users', JSON.stringify(allUsers));
+                            runRecommendationAlgorithm();
+                        }
                     }
-                } catch(e){}
+                } catch(e) {
+                    console.error("Chyba spracovania MQTT správy:", e);
+                }
             };
 
             client.connect({
                 useSSL: true,
                 timeout: 5,
+                cleanSession: false,
                 onSuccess: () => {
                     const status = document.getElementById('mqtt-status');
-                    status.innerHTML = `<span class="w-2 h-2 rounded-full bg-cyan-400 mr-2 animate-pulse"></span> EMQX Live`;
-                    status.className = "flex items-center text-xs orbitron text-cyan-400 bg-cyan-400/10 px-3 py-1 rounded-full border border-cyan-400/30";
-                    client.subscribe("facedanker/feed/sync");
-                    client.subscribe("facedanker/network/users");
+                    status.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span> Globálne Pripojené`;
+                    status.className = "flex items-center text-xs orbitron text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-full border border-emerald-400/30";
+                    
+                    client.subscribe(MQTT_FEED_TOPIC);
+                    client.subscribe(MQTT_USERS_TOPIC);
                 },
                 onFailure: () => {
                     const status = document.getElementById('mqtt-status');
-                    status.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Offline`;
+                    status.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Offline Feed`;
                     status.className = "flex items-center text-xs orbitron text-red-400 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/30";
                 }
             });
         }
 
-        function broadcastMQTT(topic, data) {
+        function broadcastFeed() {
             if (client && client.isConnected()) {
-                const msg = new Paho.MQTT.Message(JSON.stringify(data));
-                msg.destinationName = topic;
-                msg.retained = true;
+                // Posielame max posledných 25 príspevkov aby bola sieť ultra-rýchla
+                const feedPayload = posts.slice(0, 25);
+                const msg = new Paho.MQTT.Message(JSON.stringify(feedPayload));
+                msg.destinationName = MQTT_FEED_TOPIC;
+                msg.retained = true; // Zabezpečí, že každý nový návštevník ich ihneď uvidí!
                 client.send(msg);
             }
         }
 
-        // ================= ALGORITMUS ODPORÚČANIA ================= //
+        // ================= VEREJNÉ ZVEREJŇOVANIE PRÍSPEVKOV ================= //
+        function publishPost() {
+            const titleInput = document.getElementById('post-title');
+            const audioUrlInput = document.getElementById('post-audio-url');
+            const btn = document.getElementById('btn-publish');
+
+            const title = titleInput.value.trim();
+            const audioUrl = audioUrlInput.value.trim();
+            const finalAudio = selectedAudioData || audioUrl;
+
+            if (!title && !selectedImageData && !finalAudio) {
+                alert("Prosím vyber obrázok, hudbu alebo napíš popis!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Zverejňujem...";
+
+            const newPost = {
+                id: 'post_' + Date.now(),
+                author: currentUser.name,
+                authorEmail: currentUser.email,
+                verified: currentUser.verified,
+                title: title,
+                imgData: selectedImageData || null,
+                audioData: finalAudio || null,
+                likes: 0,
+                likedBy: [],
+                comments: [],
+                copyright: "FaceDanker DMCA // " + currentUser.name,
+                timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+
+            // Pridaj na začiatok
+            posts.unshift(newPost);
+            localStorage.setItem('fd_posts', JSON.stringify(posts));
+
+            // Vyčisti formulár
+            titleInput.value = '';
+            audioUrlInput.value = '';
+            clearSelectedImage();
+            selectedAudioData = null;
+            document.getElementById('post-audio-file').value = "";
+            document.getElementById('audio-upload-status').innerText = "Vybrať MP3 zo zariadenia";
+            document.getElementById('audio-upload-status').className = "text-xs font-bold text-slate-300";
+
+            renderPosts();
+            broadcastFeed();
+
+            btn.disabled = false;
+            btn.innerText = "Zverejniť Teraz";
+        }
+
+        function toggleLike(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                const idx = post.likedBy.indexOf(currentUser.email);
+                if (idx > -1) {
+                    post.likedBy.splice(idx, 1);
+                    post.likes--;
+                } else {
+                    post.likedBy.push(currentUser.email);
+                    post.likes++;
+                }
+                localStorage.setItem('fd_posts', JSON.stringify(posts));
+                renderPosts();
+                broadcastFeed();
+            }
+        }
+
+        function addComment(postId) {
+            const input = document.getElementById(`comment-input-${postId}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                post.comments.push({
+                    author: currentUser.name,
+                    verified: currentUser.verified,
+                    text: text
+                });
+                localStorage.setItem('fd_posts', JSON.stringify(posts));
+                input.value = '';
+                renderPosts();
+                broadcastFeed();
+            }
+        }
+
+        function renderPosts() {
+            const container = document.getElementById('posts-container');
+            container.innerHTML = '';
+
+            if (posts.length === 0) {
+                container.innerHTML = `
+                    <div class="glass-panel p-8 text-center text-slate-400 rounded-2xl space-y-2">
+                        <i class="fa-solid fa-satellite text-3xl text-cyan-400 mb-2"></i>
+                        <p class="font-bold text-white">Žiadne verejné príspevky v sieti.</p>
+                        <p class="text-xs">Nahraj obrázok alebo MP3 vyššie a zverejni prvý príspevok na svete!</p>
+                    </div>`;
+                return;
+            }
+
+            posts.forEach(post => {
+                if (bannedUsers.includes(post.authorEmail)) return;
+                const isLiked = post.likedBy && post.likedBy.includes(currentUser.email);
+
+                container.innerHTML += `
+                    <article class="glass-panel p-5 rounded-2xl space-y-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-900 border border-cyan-500/40 flex items-center justify-center font-bold text-cyan-400 orbitron">
+                                    ${post.author ? post.author[0].toUpperCase() : 'U'}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white flex items-center gap-1.5 text-sm">
+                                        ${post.author}
+                                        ${post.verified ? '<i class="fa-solid fa-circle-check text-cyan-400 text-xs"></i>' : ''}
+                                    </h4>
+                                    <span class="text-[10px] text-slate-400">${post.timestamp || 'Práve teraz'} • <i class="fa-solid fa-copyright text-pink-500"></i> ${post.copyright || 'Public'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${post.title ? `<p class="text-sm text-slate-200">${post.title}</p>` : ''}
+
+                        ${post.imgData ? `
+                            <div class="rounded-xl overflow-hidden border border-slate-800 max-h-[500px] bg-slate-950 flex items-center justify-center">
+                                <img src="${post.imgData}" alt="Obrázok" class="w-full object-contain max-h-[500px]">
+                            </div>
+                        ` : ''}
+
+                        ${post.audioData ? `
+                            <div class="bg-slate-900/90 p-3 rounded-xl border border-purple-500/30 flex flex-col gap-2">
+                                <div class="flex items-center gap-2 text-xs orbitron text-purple-400">
+                                    <i class="fa-solid fa-headphones animate-pulse"></i> FaceDanker Audio Prehrávač
+                                </div>
+                                <audio controls class="w-full h-8">
+                                    <source src="${post.audioData}">
+                                </audio>
+                            </div>
+                        ` : ''}
+
+                        <div class="flex items-center space-x-4 pt-2 border-t border-slate-800 text-xs">
+                            <button onclick="toggleLike('${post.id}')" class="flex items-center gap-1.5 ${isLiked ? 'text-pink-500 font-bold' : 'text-slate-400 hover:text-pink-400'} transition">
+                                <i class="fa-heart ${isLiked ? 'fa-solid' : 'fa-regular'} text-base"></i>
+                                <span>${post.likes || 0} Lajkov</span>
+                            </button>
+                            <span class="text-slate-500">•</span>
+                            <span class="text-slate-400"><i class="fa-regular fa-comment mr-1"></i> ${(post.comments || []).length} Komentárov</span>
+                        </div>
+
+                        <div class="space-y-2 pt-2">
+                            ${(post.comments || []).map(c => `
+                                <div class="text-xs bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                                    <span class="font-bold text-cyan-400 mr-1">${c.author}${c.verified ? ' ✓' : ''}:</span>
+                                    <span class="text-slate-300">${c.text}</span>
+                                </div>
+                            `).join('')}
+
+                            <div class="flex gap-2 pt-1">
+                                <input id="comment-input-${post.id}" type="text" placeholder="Napíš verejný komentár..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-cyan-400">
+                                <button onclick="addComment('${post.id}')" class="bg-cyan-500/20 border border-cyan-500/40 hover:bg-cyan-500/40 text-cyan-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            });
+        }
+
+        // ================= PROFIL & ODPORÚČACÍ ALGORITMUS ================= //
         function runRecommendationAlgorithm() {
             const list = document.getElementById('recommended-list');
             list.innerHTML = '';
 
-            const currentUserLikes = currentUser && currentUser.likes ? currentUser.likes.toLowerCase().split(',').map(s=>s.trim()) : [];
+            const currentUserLikes = currentUser.likes ? currentUser.likes.toLowerCase().split(',').map(s=>s.trim()) : [];
 
             const recommendations = allUsers
-                .filter(u => !currentUser || u.email !== currentUser.email)
+                .filter(u => u.email !== currentUser.email)
                 .map(user => {
                     let score = 0;
                     const uLikes = (user.likes || '').toLowerCase().split(',').map(s=>s.trim());
@@ -472,15 +661,13 @@
                         if (uLikes.some(ul => ul.includes(l) || l.includes(ul))) score += 40;
                     });
                     if (user.verified) score += 20;
-                    if (user.living === (currentUser ? currentUser.living : '')) score += 30;
-
                     return { user, score };
                 })
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 3);
 
             if (recommendations.length === 0) {
-                list.innerHTML = `<p class="text-[11px] text-slate-500">Žiadne ďalšie profily v sieti.</p>`;
+                list.innerHTML = `<p class="text-[11px] text-slate-500">Zatiaľ žiadne ďalšie profily.</p>`;
                 return;
             }
 
@@ -496,44 +683,15 @@
                                     ${user.name}
                                     ${user.verified ? '<i class="fa-solid fa-circle-check text-cyan-400 text-[10px]"></i>' : ''}
                                 </h4>
-                                <p class="text-[10px] text-slate-400 truncate max-w-[120px]">${user.likes || 'Media Creator'}</p>
+                                <p class="text-[10px] text-slate-400 truncate max-w-[120px]">${user.living || 'Global'}</p>
                             </div>
                         </div>
-                        <span class="text-[10px] orbitron text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20">
-                            ${Math.min(99, 65 + score)}% Zhoda
+                        <span class="text-[10px] orbitron text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded">
+                            ${Math.min(99, 70 + score)}%
                         </span>
                     </div>
                 `;
             });
-        }
-
-        // ================= AUTH A PROFIL ================= //
-        function handleUserAuth() {
-            const name = document.getElementById('auth-username').value.trim();
-            const email = document.getElementById('auth-email').value.trim().toLowerCase();
-
-            if (!name || !email) return alert("Vyplň všetky polia!");
-
-            currentUser = {
-                name: name,
-                email: email,
-                verified: false,
-                birthplace: "Neuvedené",
-                living: "Neuvedené",
-                likes: "Hudba, Fotografia, Cyberpunk"
-            };
-
-            const existingIdx = allUsers.findIndex(u => u.email === email);
-            if (existingIdx === -1) {
-                allUsers.push(currentUser);
-            } else {
-                currentUser = allUsers[existingIdx];
-            }
-
-            saveState();
-            document.getElementById('auth-modal').classList.add('hidden');
-            updateUI();
-            runRecommendationAlgorithm();
         }
 
         function updateUI() {
@@ -541,245 +699,74 @@
             const authActions = document.getElementById('auth-actions');
             const adminNavBtn = document.getElementById('admin-nav-btn');
 
-            if (isSuperAdmin) {
-                adminNavBtn.classList.remove('hidden');
+            if (isSuperAdmin) adminNavBtn.classList.remove('hidden');
+
+            userCard.innerHTML = `
+                <div class="w-16 h-16 rounded-full mx-auto bg-gradient-to-tr from-cyan-400 via-purple-500 to-pink-500 p-0.5 mb-2 shadow-lg shadow-cyan-500/20">
+                    <div class="w-full h-full bg-slate-950 rounded-full flex items-center justify-center font-bold text-xl orbitron text-cyan-400">
+                        ${currentUser.name[0].toUpperCase()}
+                    </div>
+                </div>
+                <h4 class="font-bold text-white flex items-center justify-center gap-1.5">
+                    ${currentUser.name}
+                    ${currentUser.verified ? '<i class="fa-solid fa-circle-check text-cyan-400 text-sm"></i>' : ''}
+                </h4>
+                <p class="text-[11px] text-slate-400 mb-2">${currentUser.email}</p>
+                <div class="text-[11px] text-slate-300 space-y-1 bg-slate-900/80 p-2.5 rounded-xl text-left border border-slate-800">
+                    <div><strong class="text-cyan-400">Narodenie:</strong> ${currentUser.birthplace || 'Neuvedené'}</div>
+                    <div><strong class="text-cyan-400">Bydlisko:</strong> ${currentUser.living || 'Neuvedené'}</div>
+                </div>
+            `;
+
+            authActions.innerHTML = `
+                <button onclick="document.getElementById('auth-modal').classList.remove('hidden')" class="orbitron text-xs bg-slate-900 hover:bg-cyan-500/20 text-cyan-300 border border-slate-700 px-3 py-1.5 rounded-xl transition">
+                    Zmeniť Profil
+                </button>
+            `;
+
+            document.getElementById('prof-name').innerText = currentUser.name;
+            document.getElementById('prof-email').innerText = currentUser.email;
+            document.getElementById('prof-birthplace').value = currentUser.birthplace || "";
+            document.getElementById('prof-living').value = currentUser.living || "";
+            document.getElementById('prof-likes').value = currentUser.likes || "";
+
+            if (currentUser.verified) {
+                document.getElementById('prof-badge').classList.remove('hidden');
             } else {
-                adminNavBtn.classList.add('hidden');
+                document.getElementById('prof-badge').classList.add('hidden');
             }
+        }
 
-            if (currentUser) {
-                if (bannedUsers.includes(currentUser.email)) {
-                    alert("Tento účet bol globálne zablokovaný administrátorom.");
-                    logout();
-                    return;
-                }
+        function handleUserAuth() {
+            const name = document.getElementById('auth-username').value.trim();
+            const email = document.getElementById('auth-email').value.trim().toLowerCase();
+            if (!name || !email) return alert("Vyplň údaje!");
 
-                userCard.innerHTML = `
-                    <div class="w-16 h-16 rounded-full mx-auto bg-gradient-to-tr from-cyan-400 via-purple-500 to-pink-500 p-0.5 mb-2 shadow-lg shadow-cyan-500/20">
-                        <div class="w-full h-full bg-slate-950 rounded-full flex items-center justify-center font-bold text-xl orbitron text-cyan-400">
-                            ${currentUser.name[0].toUpperCase()}
-                        </div>
-                    </div>
-                    <h4 class="font-bold text-white flex items-center justify-center gap-1.5">
-                        ${currentUser.name}
-                        ${currentUser.verified ? '<i class="fa-solid fa-circle-check text-cyan-400 text-sm"></i>' : ''}
-                    </h4>
-                    <p class="text-[11px] text-slate-400 mb-2">${currentUser.email}</p>
-                    <div class="text-[11px] text-slate-300 space-y-1 bg-slate-900/80 p-2.5 rounded-xl text-left border border-slate-800">
-                        <div><strong class="text-cyan-400">Narodenie:</strong> ${currentUser.birthplace || 'Neuvedené'}</div>
-                        <div><strong class="text-cyan-400">Bydlisko:</strong> ${currentUser.living || 'Neuvedené'}</div>
-                    </div>
-                `;
-
-                authActions.innerHTML = `
-                    <button onclick="logout()" class="orbitron text-xs bg-slate-900 hover:bg-red-500/20 text-slate-300 hover:text-red-400 border border-slate-700 px-3 py-1.5 rounded-xl transition">
-                        Odhlásiť
-                    </button>
-                `;
-
-                document.getElementById('prof-name').innerText = currentUser.name;
-                document.getElementById('prof-email').innerText = currentUser.email;
-                document.getElementById('prof-birthplace').value = currentUser.birthplace || "";
-                document.getElementById('prof-living').value = currentUser.living || "";
-                document.getElementById('prof-likes').value = currentUser.likes || "";
-                
-                if (currentUser.verified) {
-                    document.getElementById('prof-badge').classList.remove('hidden');
-                } else {
-                    document.getElementById('prof-badge').classList.add('hidden');
-                }
-            }
+            currentUser.name = name;
+            currentUser.email = email;
+            localStorage.setItem('fd_user', JSON.stringify(currentUser));
+            document.getElementById('auth-modal').classList.add('hidden');
+            updateUI();
         }
 
         function saveProfile() {
-            if(!currentUser) return;
             currentUser.birthplace = document.getElementById('prof-birthplace').value.trim();
             currentUser.living = document.getElementById('prof-living').value.trim();
             currentUser.likes = document.getElementById('prof-likes').value.trim();
-            
-            const idx = allUsers.findIndex(u => u.email === currentUser.email);
-            if(idx > -1) allUsers[idx] = currentUser;
-
-            saveState();
+            localStorage.setItem('fd_user', JSON.stringify(currentUser));
             updateUI();
-            runRecommendationAlgorithm();
-            alert("Profil aktualizovaný!");
+            alert("Profil bol úspešne uložený!");
         }
 
         function requestVerification() {
-            if(!currentUser) return;
-            if(currentUser.verified) return alert("Účet už má overenú fajku!");
-            if(!verifyRequests.some(r => r.email === currentUser.email)) {
+            if (currentUser.verified) return alert("Už máš overený účet!");
+            if (!verifyRequests.some(r => r.email === currentUser.email)) {
                 verifyRequests.push({ name: currentUser.name, email: currentUser.email });
                 localStorage.setItem('fd_verify_reqs', JSON.stringify(verifyRequests));
                 alert("Žiadosť odoslaná Adminovi!");
             } else {
-                alert("Žiadosť už bola odoslaná.");
+                alert("Žiadosť už čaká na schválenie.");
             }
-        }
-
-        function logout() {
-            localStorage.removeItem('fd_user');
-            currentUser = null;
-            location.reload();
-        }
-
-        // ================= ZVEREJŇOVANIE PRÍSPEVKOV ================= //
-        function publishPost() {
-            if (!currentUser) return alert("Najprv sa prihlás!");
-            
-            const title = document.getElementById('post-title').value.trim();
-
-            if (!title && !selectedImageData && !selectedAudioData) {
-                return alert("Zadaj popis alebo vyber obrázok / hudbu zo zariadenia!");
-            }
-
-            const newPost = {
-                id: 'post_' + Date.now(),
-                author: currentUser.name,
-                authorEmail: currentUser.email,
-                verified: currentUser.verified,
-                title: title,
-                imgData: selectedImageData,   // Nahraný obrázok
-                audioData: selectedAudioData, // Nahraná hudba
-                likes: 0,
-                likedBy: [],
-                comments: [],
-                copyright: "FaceDanker Protected // " + currentUser.name,
-                timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            };
-
-            posts.unshift(newPost);
-            saveState();
-
-            // Reset formulára
-            document.getElementById('post-title').value = '';
-            clearSelectedImage();
-            selectedAudioData = null;
-            document.getElementById('post-audio-file').value = "";
-            document.getElementById('audio-upload-status').innerText = "Vybrať MP3 / Hudbu zo zariadenia";
-            document.getElementById('audio-upload-status').className = "text-xs font-bold text-slate-300";
-
-            renderPosts();
-            broadcastMQTT("facedanker/feed/sync", posts);
-        }
-
-        function toggleLike(postId) {
-            if (!currentUser) return;
-            const post = posts.find(p => p.id === postId);
-            if (post) {
-                const idx = post.likedBy.indexOf(currentUser.email);
-                if (idx > -1) {
-                    post.likedBy.splice(idx, 1);
-                    post.likes--;
-                } else {
-                    post.likedBy.push(currentUser.email);
-                    post.likes++;
-                }
-                saveState();
-                renderPosts();
-                broadcastMQTT("facedanker/feed/sync", posts);
-            }
-        }
-
-        function addComment(postId) {
-            if (!currentUser) return alert("Prihlás sa!");
-            const input = document.getElementById(`comment-input-${postId}`);
-            const text = input.value.trim();
-            if (!text) return;
-
-            const post = posts.find(p => p.id === postId);
-            if (post) {
-                post.comments.push({
-                    author: currentUser.name,
-                    verified: currentUser.verified,
-                    text: text
-                });
-                saveState();
-                input.value = '';
-                renderPosts();
-                broadcastMQTT("facedanker/feed/sync", posts);
-            }
-        }
-
-        function renderPosts() {
-            const container = document.getElementById('posts-container');
-            container.innerHTML = '';
-
-            if (posts.length === 0) {
-                container.innerHTML = `<div class="glass-panel p-8 text-center text-slate-500 rounded-2xl">Žiadne príspevky. Nahraj prvý obrázok zo zariadenia!</div>`;
-                return;
-            }
-
-            posts.forEach(post => {
-                if (bannedUsers.includes(post.authorEmail)) return;
-                const isLiked = currentUser && post.likedBy.includes(currentUser.email);
-
-                container.innerHTML += `
-                    <article class="glass-panel p-5 rounded-2xl space-y-4">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 rounded-full bg-slate-900 border border-cyan-500/40 flex items-center justify-center font-bold text-cyan-400 orbitron">
-                                    ${post.author[0].toUpperCase()}
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-white flex items-center gap-1.5 text-sm">
-                                        ${post.author}
-                                        ${post.verified ? '<i class="fa-solid fa-circle-check text-cyan-400 text-xs"></i>' : ''}
-                                    </h4>
-                                    <span class="text-[10px] text-slate-400">${post.timestamp} • <i class="fa-solid fa-copyright text-pink-500"></i> ${post.copyright}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        ${post.title ? `<p class="text-sm text-slate-200">${post.title}</p>` : ''}
-
-                        <!-- Zobrazenie nahraného obrázku -->
-                        ${post.imgData ? `
-                            <div class="rounded-xl overflow-hidden border border-slate-800 max-h-[500px] bg-slate-950 flex items-center justify-center">
-                                <img src="${post.imgData}" alt="Nahraný Obrázok" class="w-full object-contain max-h-[500px]">
-                            </div>
-                        ` : ''}
-
-                        <!-- Zobrazenie nahranej hudby -->
-                        ${post.audioData ? `
-                            <div class="bg-slate-900/90 p-3 rounded-xl border border-purple-500/30 flex flex-col gap-2">
-                                <div class="flex items-center gap-2 text-xs orbitron text-purple-400">
-                                    <i class="fa-solid fa-headphones animate-pulse"></i> FaceDanker Prehrávač Zvuku
-                                </div>
-                                <audio controls class="w-full h-8">
-                                    <source src="${post.audioData}">
-                                </audio>
-                            </div>
-                        ` : ''}
-
-                        <div class="flex items-center space-x-4 pt-2 border-t border-slate-800 text-xs">
-                            <button onclick="toggleLike('${post.id}')" class="flex items-center gap-1.5 ${isLiked ? 'text-pink-500 font-bold' : 'text-slate-400 hover:text-pink-400'} transition">
-                                <i class="fa-heart ${isLiked ? 'fa-solid' : 'fa-regular'} text-base"></i>
-                                <span>${post.likes} Lajkov</span>
-                            </button>
-                            <span class="text-slate-500">•</span>
-                            <span class="text-slate-400"><i class="fa-regular fa-comment mr-1"></i> ${post.comments.length} Komentárov</span>
-                        </div>
-
-                        <div class="space-y-2 pt-2">
-                            ${post.comments.map(c => `
-                                <div class="text-xs bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                                    <span class="font-bold text-cyan-400 mr-1">${c.author}${c.verified ? ' ✓' : ''}:</span>
-                                    <span class="text-slate-300">${c.text}</span>
-                                </div>
-                            `).join('')}
-
-                            <div class="flex gap-2 pt-1">
-                                <input id="comment-input-${post.id}" type="text" placeholder="Komentovať médium..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-cyan-400">
-                                <button onclick="addComment('${post.id}')" class="bg-cyan-500/20 border border-cyan-500/40 hover:bg-cyan-500/40 text-cyan-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">
-                                    <i class="fa-solid fa-paper-plane"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </article>
-                `;
-            });
         }
 
         // ================= SUPERADMIN HUD (AQ#Admin_9842!CoreX) ================= //
@@ -790,21 +777,17 @@
             document.getElementById('admin-auth-modal').classList.add('hidden');
             document.getElementById('admin-key-input').value = '';
         }
-
         function verifyAdminKey() {
-            const inputKey = document.getElementById('admin-key-input').value;
-            if (inputKey === SECRET_ADMIN_KEY) {
+            if (document.getElementById('admin-key-input').value === SECRET_ADMIN_KEY) {
                 isSuperAdmin = true;
                 sessionStorage.setItem('fd_is_admin', 'true');
                 closeAdminAuthModal();
                 updateUI();
                 showSection('admin');
-                alert("SuperAdmin Core Autorizovaný!");
             } else {
                 alert("Nesprávny autorizačný kľúč!");
             }
         }
-
         function logoutAdmin() {
             isSuperAdmin = false;
             sessionStorage.removeItem('fd_is_admin');
@@ -815,171 +798,75 @@
         function renderAdminHUD() {
             if (!isSuperAdmin) return;
 
-            // 1. Žiadosti o fajku
+            // Žiadosti
             const verifyList = document.getElementById('admin-verify-list');
-            verifyList.innerHTML = '';
-            if (verifyRequests.length === 0) {
-                verifyList.innerHTML = `<p class="text-xs text-slate-500">Žiadne čakajúce žiadosti.</p>`;
-            } else {
-                verifyRequests.forEach((req, idx) => {
-                    verifyList.innerHTML += `
-                        <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-cyan-500/30 text-xs">
-                            <div>
-                                <span class="font-bold text-white">${req.name}</span>
-                                <span class="text-slate-400 ml-2">(${req.email})</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="adminToggleVerification('${req.email}', true); verifyRequests.splice(${idx},1); renderAdminHUD();" class="bg-cyan-500 text-slate-950 font-bold px-3 py-1 rounded-lg">Udeliť Fajku ✓</button>
-                                <button onclick="verifyRequests.splice(${idx},1); renderAdminHUD();" class="bg-slate-800 text-slate-400 px-3 py-1 rounded-lg">Zamietnuť</button>
-                            </div>
+            verifyList.innerHTML = verifyRequests.length === 0 ? `<p class="text-xs text-slate-500">Žiadne žiadosti.</p>` : '';
+            verifyRequests.forEach((req, idx) => {
+                verifyList.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-cyan-500/30 text-xs">
+                        <span><strong>${req.name}</strong> (${req.email})</span>
+                        <div class="flex gap-2">
+                            <button onclick="adminGrantVerification('${req.email}', ${idx})" class="bg-cyan-500 text-slate-950 font-bold px-3 py-1 rounded-lg">Udeliť Fajku ✓</button>
+                            <button onclick="verifyRequests.splice(${idx},1); renderAdminHUD();" class="bg-slate-800 text-slate-400 px-3 py-1 rounded-lg">Zmazať</button>
                         </div>
-                    `;
-                });
-            }
-
-            // 2. Používatelia - Úplná manipulácia
-            const userTable = document.getElementById('admin-users-table');
-            userTable.innerHTML = '';
-            allUsers.forEach((u) => {
-                const isBanned = bannedUsers.includes(u.email);
-                userTable.innerHTML += `
-                    <div class="bg-slate-950 p-4 rounded-xl border ${isBanned ? 'border-red-600/50 bg-red-950/20' : 'border-slate-800'} text-xs space-y-3">
-                        <div class="flex justify-between items-start flex-wrap gap-2">
-                            <div>
-                                <span class="font-bold text-white text-sm">${u.name}</span>
-                                ${u.verified ? '<i class="fa-solid fa-circle-check text-cyan-400 ml-1"></i>' : ''}
-                                <span class="text-slate-400 ml-2">(${u.email})</span>
-                                ${isBanned ? '<span class="text-red-500 font-bold ml-2">[ZABANOVANÝ]</span>' : ''}
-                            </div>
-                            <div class="flex gap-1.5 flex-wrap">
-                                <button onclick="adminToggleVerification('${u.email}', ${!u.verified})" class="bg-cyan-600/30 border border-cyan-500 text-cyan-300 px-2 py-1 rounded-lg">
-                                    ${u.verified ? 'Zobrať Fajku' : 'Dať Fajku ✓'}
-                                </button>
-                                <button onclick="adminEditUserModal('${u.email}')" class="bg-purple-600/30 border border-purple-500 text-purple-300 px-2 py-1 rounded-lg">
-                                    Upraviť Dáta
-                                </button>
-                                <button onclick="adminToggleBan('${u.email}')" class="${isBanned ? 'bg-green-600' : 'bg-red-600'} text-white font-bold px-2 py-1 rounded-lg">
-                                    ${isBanned ? 'UNBAN' : 'BAN'}
-                                </button>
-                                <button onclick="adminDeleteUserAccount('${u.email}')" class="bg-red-900 border border-red-500 text-red-200 px-2 py-1 rounded-lg">
-                                    Vymazať Účet
-                                </button>
-                            </div>
-                        </div>
-                        <div class="text-[11px] text-slate-400 grid grid-cols-1 md:grid-cols-3 gap-2 bg-slate-900/80 p-2 rounded-lg">
-                            <div><strong>Narodenie:</strong> ${u.birthplace || 'N/A'}</div>
-                            <div><strong>Bydlisko:</strong> ${u.living || 'N/A'}</div>
-                            <div><strong>Záujmy:</strong> ${u.likes || 'N/A'}</div>
-                        </div>
-                    </div>
-                `;
+                    </div>`;
             });
 
-            // 3. Príspevky & DMCA
+            // Moderácia Príspevkov
             const postsList = document.getElementById('admin-posts-list');
             postsList.innerHTML = '';
             posts.forEach(p => {
                 postsList.innerHTML += `
                     <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs flex-wrap gap-2">
-                        <div>
-                            <span class="font-bold text-pink-400">${p.author}</span>: "${p.title || 'Médiá'}"
-                            <div class="text-[10px] text-slate-500">DMCA: ${p.copyright}</div>
-                        </div>
+                        <div><strong class="text-pink-400">${p.author}</strong>: "${p.title || 'Médiá'}"</div>
                         <div class="flex gap-2">
-                            <button onclick="adminEditDMCA('${p.id}')" class="bg-purple-600/30 text-purple-300 border border-purple-500 px-2 py-1 rounded-lg">Zmeniť Copyright</button>
-                            <button onclick="adminDeletePost('${p.id}')" class="bg-red-600/30 text-red-400 border border-red-500 px-2 py-1 rounded-lg">Zmazať Príspevok</button>
+                            <button onclick="adminEditDMCA('${p.id}')" class="bg-purple-600/30 text-purple-300 border border-purple-500 px-2 py-1 rounded-lg">Zmeniť DMCA</button>
+                            <button onclick="adminDeletePost('${p.id}')" class="bg-red-600/30 text-red-400 border border-red-500 px-2 py-1 rounded-lg">Zmazať</button>
+                            <button onclick="adminBanUser('${p.authorEmail}')" class="bg-red-600 text-white font-bold px-2 py-1 rounded-lg">BAN Užívateľa</button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
-        function adminToggleVerification(email, status) {
-            const user = allUsers.find(u => u.email === email);
-            if (user) {
-                user.verified = status;
-                if (currentUser && currentUser.email === email) currentUser.verified = status;
-                posts.forEach(p => { if (p.authorEmail === email) p.verified = status; });
-                saveState();
-                updateUI();
-                renderPosts();
-                renderAdminHUD();
-                broadcastMQTT("facedanker/network/users", allUsers);
-                broadcastMQTT("facedanker/feed/sync", posts);
-            }
-        }
-
-        function adminToggleBan(email) {
-            const idx = bannedUsers.indexOf(email);
-            if (idx > -1) {
-                bannedUsers.splice(idx, 1);
-            } else {
-                bannedUsers.push(email);
-            }
-            localStorage.setItem('fd_banned', JSON.stringify(bannedUsers));
-            renderAdminHUD();
-            renderPosts();
-        }
-
-        function adminEditUserModal(email) {
-            const u = allUsers.find(user => user.email === email);
-            if (!u) return;
-            const newName = prompt("Zmeň Meno:", u.name) || u.name;
-            const newBirth = prompt("Zmeň Miesto narodenia:", u.birthplace) || u.birthplace;
-            const newLiving = prompt("Zmeň Aktuálne bydlisko:", u.living) || u.living;
-            const newLikes = prompt("Zmeň Záujmy:", u.likes) || u.likes;
-
-            u.name = newName;
-            u.birthplace = newBirth;
-            u.living = newLiving;
-            u.likes = newLikes;
-
-            if (currentUser && currentUser.email === email) currentUser = u;
-
-            saveState();
-            updateUI();
-            runRecommendationAlgorithm();
-            renderAdminHUD();
-            broadcastMQTT("facedanker/network/users", allUsers);
-        }
-
-        function adminDeleteUserAccount(email) {
-            if (!confirm(`Naozaj chceš zmazať účet ${email} a všetky jeho príspevky?`)) return;
-            allUsers = allUsers.filter(u => u.email !== email);
-            posts = posts.filter(p => p.authorEmail !== email);
-            saveState();
-            renderPosts();
-            renderAdminHUD();
-            runRecommendationAlgorithm();
-            broadcastMQTT("facedanker/network/users", allUsers);
-            broadcastMQTT("facedanker/feed/sync", posts);
-        }
-
-        function adminEditDMCA(postId) {
-            const post = posts.find(p => p.id === postId);
-            if (!post) return;
-            const newCopy = prompt("Zadaj novú informáciu o autorských právach (DMCA/Copyright):", post.copyright);
-            if (newCopy) {
-                post.copyright = newCopy;
-                saveState();
-                renderPosts();
-                renderAdminHUD();
-                broadcastMQTT("facedanker/feed/sync", posts);
-            }
-        }
-
-        function adminDeletePost(postId) {
-            posts = posts.filter(p => p.id !== postId);
-            saveState();
-            renderPosts();
-            renderAdminHUD();
-            broadcastMQTT("facedanker/feed/sync", posts);
-        }
-
-        function saveState() {
-            if(currentUser) localStorage.setItem('fd_user', JSON.stringify(currentUser));
+        function adminGrantVerification(email, idx) {
+            verifyRequests.splice(idx, 1);
+            localStorage.setItem('fd_verify_reqs', JSON.stringify(verifyRequests));
+            if (currentUser.email === email) currentUser.verified = true;
+            posts.forEach(p => { if (p.authorEmail === email) p.verified = true; });
             localStorage.setItem('fd_posts', JSON.stringify(posts));
-            localStorage.setItem('fd_all_users', JSON.stringify(allUsers));
+            updateUI();
+            renderPosts();
+            renderAdminHUD();
+            broadcastFeed();
+        }
+
+        function adminDeletePost(id) {
+            posts = posts.filter(p => p.id !== id);
+            localStorage.setItem('fd_posts', JSON.stringify(posts));
+            renderPosts();
+            renderAdminHUD();
+            broadcastFeed();
+        }
+
+        function adminBanUser(email) {
+            if (!bannedUsers.includes(email)) bannedUsers.push(email);
+            localStorage.setItem('fd_banned', JSON.stringify(bannedUsers));
+            renderPosts();
+            renderAdminHUD();
+            alert(`Užívateľ ${email} bol zablokovaný.`);
+        }
+
+        function adminEditDMCA(id) {
+            const p = posts.find(post => post.id === id);
+            if (!p) return;
+            const newDMCA = prompt("Nové autorské práva:", p.copyright);
+            if (newDMCA) {
+                p.copyright = newDMCA;
+                localStorage.setItem('fd_posts', JSON.stringify(posts));
+                renderPosts();
+                renderAdminHUD();
+                broadcastFeed();
+            }
         }
 
         function showSection(sec) {
